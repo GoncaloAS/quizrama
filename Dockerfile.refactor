@@ -1,0 +1,17 @@
+FROM node:20-bookworm
+
+# Ferramentas básicas
+RUN apt-get update && apt-get install -y \
+    git curl ca-certificates sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala o Claude Code globalmente
+RUN npm install -g @anthropic-ai/claude-code
+
+# Prepara workspace para o utilizador `node` que já existe (UID 1000)
+RUN mkdir -p /workspace && chown -R node:node /workspace
+
+USER node
+WORKDIR /workspace
+
+CMD ["bash"]

@@ -1,0 +1,14 @@
+{
+  "name": "os-quiz",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Quiz interactivo de Sistemas de Operações + gerador de guia de estudo em .docx.",
+  "scripts": {
+    "test": "node tests/smoke/run-all.js",
+    "validate": "bash tests/validate.sh",
+    "build:guide": "node tools/os-guide/index.js"
+  },
+  "dependencies": {
+    "docx": "^9.0.0"
+  }
+}
