@@ -3,7 +3,8 @@
  *  1/2/3/4 — selecciona opção A/B/C/D (se ainda não respondida)
  *  ←/→     — navegar entre perguntas (dentro do filtro actual)
  *  S       — skip (igual a →)
- *  R       — retry — limpa respostas do filtro actual
+ *  T       — retry — limpa só a pergunta actual
+ *  R       — retry — limpa respostas do filtro actual e baralha
  *
  * Ignora eventos enquanto o utilizador está num INPUT/TEXTAREA.
  */
@@ -17,5 +18,6 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight") next();
   if(e.key==="ArrowLeft")  prev();
   if(e.key==="s"||e.key==="S") skip();
+  if(e.key==="t"||e.key==="T") retryCurrent();
   if(e.key==="r"||e.key==="R") retryWrong();
 });
