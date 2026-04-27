@@ -51,13 +51,28 @@ function prev(){
 }
 function skip(){next();}
 
+/**
+ * Re-baralha as perguntas dentro do filtro actual, preservando as posições
+ * (slots) em questionOrder. Resultado: o heatmap continua sequencial,
+ * mas o conteúdo de cada slot muda — "pergunta 1 de C" passa a ser outra.
+ */
+function reshuffleFiltered(){
+  if(state.filteredOrder.length<=1) return;
+  const positions=[...state.filteredOrder];
+  const qIndices=positions.map(pos=>state.questionOrder[pos]);
+  const shuffled=shuffle(qIndices);
+  positions.forEach((pos,i)=>{state.questionOrder[pos]=shuffled[i];});
+}
+
 function retryWrong(){
-  // Clear ALL answers within the current filter (right or wrong) and let the user redo
+  // Clear ALL answers within the current filter (right or wrong), reshuffle, and let the user redo
   if(!state.filteredOrder.length){showToast("Nada para refazer!");return;}
   const label=state.filter||"All Topics";
-  if(!confirm(`Limpar todas as respostas de "${label}" (${state.filteredOrder.length} perguntas)?`)) return;
+  if(!confirm(`Limpar e baralhar todas as respostas de "${label}" (${state.filteredOrder.length} perguntas)?`)) return;
   // Null out results within the filter
   state.filteredOrder.forEach(pos=>{state.results[state.questionOrder[pos]]=null;});
+  // Reshuffle the question slots inside the current filter
+  reshuffleFiltered();
   // Recompute topicErrors from scratch (since some may now be null)
   state.topicErrors={};
   for(let qIdx=0;qIdx<ALL.length;qIdx++){
@@ -70,8 +85,26 @@ function retryWrong(){
   state.index=state.filteredOrder[0];
   state.streak=0;
   saveState();
-  showToast(`Limpo — refazer ${state.filteredOrder.length} perguntas`);
+  showToast(`Baralhado — refazer ${state.filteredOrder.length} perguntas`);
   render();
+}
+
+function retryCurrent(){
+  const qIdx=state.questionOrder[state.index];
+  const res=state.results[qIdx];
+  if(!res){showToast("Esta pergunta ainda não foi respondida.");return;}
+  if(!res.correct){
+    const t=ALL[qIdx][0];
+    if(state.topicErrors[t]){
+      state.topicErrors[t]--;
+      if(state.topicErrors[t]<=0) delete state.topicErrors[t];
+    }
+  }
+  state.results[qIdx]=null;
+  state.streak=0;
+  saveState();
+  render();
+  showToast("Pergunta limpa — tenta de novo");
 }
 
 function confirmReset(){
