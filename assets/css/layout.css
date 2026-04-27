@@ -1,0 +1,173 @@
+/* Layout — shell grid, topbar, sidebar, main, mobile drawer */
+
+/* SHELL */
+.shell{display:grid;grid-template-columns:270px 1fr;grid-template-rows:auto 1fr;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{
+  grid-column:1/-1;
+  display:flex;align-items:center;gap:20px;
+  padding:13px 28px;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,12,24,.9);
+  backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{
+  font-size:1rem;font-weight:800;letter-spacing:-.01em;
+  background:linear-gradient(135deg,#5b8af0,#a78bfa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;
+}
+.topbar-progress{flex:1;display:flex;flex-direction:column;gap:5px;}
+.pbar{height:4px;background:var(--border2);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease;}
+.plabels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.topbar-meta{display:flex;align-items:center;gap:14px;}
+
+/* SCORE RING (topbar) */
+.score-ring-wrap{display:flex;align-items:center;gap:8px;}
+.score-ring{width:40px;height:40px;}
+.score-ring circle{fill:none;stroke-width:4;stroke-linecap:round;}
+.ring-bg{stroke:rgba(255,255,255,.07);}
+.ring-fill{stroke:url(#ringGrad);transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dasharray .5s ease;}
+
+/* SIDEBAR */
+.sidebar{
+  grid-row:2;
+  border-right:1px solid var(--border);
+  padding:16px 14px;
+  overflow:hidden;
+  position:sticky;top:55px;height:calc(100vh - 55px);
+  display:flex;flex-direction:column;gap:10px;
+}
+/* Topic-section grows/shrinks; others stay natural size */
+.s-section{flex-shrink:0;}
+.s-topic-section{flex:1 1 auto;min-height:140px;display:flex;flex-direction:column;}
+.s-topic-section .s-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.s-topic-section .s-body.hidden{display:none;}
+.s-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.s-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 13px;cursor:pointer;user-select:none;
+  font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);border-bottom:1px solid transparent;transition:color .15s;
+}
+.s-header:hover{color:var(--text);}
+.s-header.open{border-bottom-color:var(--border);color:var(--text);}
+.s-body{padding:10px 12px;font-size:.8rem;}
+.s-body.hidden{display:none;}
+
+/* MAIN */
+.main{grid-row:2;padding:24px 32px;display:flex;flex-direction:column;gap:14px;min-width:0;}
+
+/* MOBILE DRAWER — close bar dentro da sidebar (escondida em desktop) */
+.sidebar-close{display:none;}
+
+/* HAMBURGER BUTTON — escondido em desktop */
+.hamburger{
+  display:none;
+  width:40px;height:36px;
+  align-items:center;justify-content:center;
+  background:rgba(91,138,240,.12);
+  border:1px solid rgba(91,138,240,.3);
+  border-radius:8px;cursor:pointer;
+  color:var(--accent);
+  font-size:1.2rem;flex-shrink:0;
+  transition:background .15s;
+}
+.hamburger:hover{background:rgba(91,138,240,.2);}
+.hamburger:active{transform:scale(.95);}
+
+/* BACKDROP for sidebar drawer on mobile */
+.sidebar-backdrop{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(3px);
+  z-index:90;
+  opacity:0;transition:opacity .25s ease;
+}
+.sidebar-backdrop.show{opacity:1;}
+
+/* === MOBILE LAYOUT === */
+@media(max-width:900px){
+  /* Single-column layout — main fills width */
+  .shell{grid-template-columns:1fr;}
+
+  /* Sidebar becomes a drawer slid in from the left */
+  .sidebar{
+    position:fixed;
+    top:0;left:0;
+    width:min(310px, 86vw);
+    height:100vh;
+    z-index:100;
+    background:var(--bg);
+    border-right:1px solid var(--border2);
+    box-shadow:6px 0 24px rgba(0,0,0,.4);
+    transform:translateX(-100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    padding:16px 14px;
+    overflow-y:auto;
+  }
+  .sidebar.open{transform:translateX(0);}
+
+  /* Add a close button at the top of the sidebar when open */
+  .sidebar-close{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:6px 4px 12px;
+    margin-bottom:6px;
+    border-bottom:1px solid var(--border);
+  }
+  .sidebar-close-title{
+    font-size:.8rem;font-weight:800;letter-spacing:.04em;
+    background:linear-gradient(135deg,#5b8af0,#a78bfa);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .sidebar-close-btn{
+    background:rgba(255,255,255,.05);border:1px solid var(--border2);
+    color:var(--text);width:32px;height:32px;border-radius:8px;
+    cursor:pointer;font-size:1rem;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* Show backdrop when sidebar is open */
+  .sidebar.open ~ .sidebar-backdrop,
+  .sidebar-backdrop.show{display:block;}
+
+  /* Show hamburger button */
+  .hamburger{display:flex;}
+
+  /* Compact topbar */
+  .main{padding:14px;}
+  .topbar{padding:10px 12px;gap:10px;}
+  .topbar-title{display:none;}
+  .topbar-progress{gap:3px;}
+  .plabels{font-size:.62rem;}
+
+  /* Condense topbar metrics — hide streak badge to save space */
+  .stat-chip{min-width:38px;}
+  .stat-chip .val{font-size:.92rem;}
+  .stat-chip .lbl{font-size:.55rem;}
+  .topbar-meta{gap:8px;}
+  .score-ring{width:34px;height:34px;}
+  .streak-badge{display:none;}
+
+  /* Smaller heatmap cells on mobile so the whole map fits */
+  .heatmap{grid-template-columns:repeat(auto-fill,minmax(14px,1fr));}
+  .hcell{aspect-ratio:1;}
+}
+
+/* === EXTRA SMALL — phones in portrait (e.g., iPhone SE) === */
+@media(max-width:420px){
+  .topbar{padding:8px 10px;gap:8px;}
+  .stat-chip:not(.good):not(.bad){display:none;} /* hide score%, keep correct/wrong only */
+  .topbar-meta{gap:6px;}
+  .main{padding:10px;}
+  .qcard{padding:18px 16px !important;}
+  .qtext{font-size:.95rem !important;}
+  .opt{padding:10px 12px !important;font-size:.85rem !important;}
+  .nav-bar{flex-wrap:wrap;gap:6px !important;}
+  .nav-bar .btn{padding:8px 12px !important;font-size:.78rem !important;}
+  .kbdhints{display:none;}  /* keyboard hints irrelevant on touch */
+}

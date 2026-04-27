@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Output
+OS_Improved_Study_Guide.docx
+
+# Editor
+.vscode/
+.idea/
+*.swp
