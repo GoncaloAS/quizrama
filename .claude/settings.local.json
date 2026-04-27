@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F\"'\" '{print NR, $2, $4}' /Users/goncalosousa/Downloads/os/output.js)",
+      "Bash(awk -F'#|-' '{print $2}')",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(sed:*)",
+      "Skill(update-config)"
+    ]
+  }
+}

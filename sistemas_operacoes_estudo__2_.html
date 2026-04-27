@@ -593,11 +593,30 @@ libs</i></sub></p>
 
 <h2 id="1-compilação-em-c">1. Compilação em C</h2>
 <p>Um programa C básico ("Hello World"):</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Hello World!</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>#include &lt;stdio.h&gt;
+int main() {
+    printf(&quot;Hello World!\n&quot;);
+    return 0;
+}</code></pre>
+<h3 id="fases-da-compilação">Fases da compilação</h3>
+<p>A compilação de um programa C tem <strong>4 fases
+sequenciais</strong>:</p>
+<pre><code>.c  →  Pré-processador  →  .i  →  Compilador  →  .o  →  Linker  →  executável  →  Loader  →  RAM</code></pre>
+<ol type="1">
+<li><strong>Pré-processador</strong>: resolve <code>#include</code>,
+<code>#define</code>, comentários e directivas. Output: ficheiro
+<code>.i</code>.</li>
+<li><strong>Compilador</strong>: traduz C → assembly → código-objecto
+(<code>.o</code>).</li>
+<li><strong>Linker</strong>: junta vários <code>.o</code> + bibliotecas,
+resolve referências externas → executável.</li>
+<li><strong>Loader</strong>: carrega o executável para RAM e dá-lhe
+controlo (em runtime, não compile-time).</li>
+</ol>
+<blockquote>
+<p>Mnemónica: <strong>P</strong>ré → <strong>C</strong>ompilar →
+<strong>L</strong>inkar → <strong>L</strong>oad.</p>
+</blockquote>
 <h3 id="flags-principais-do-compilador-gcc">Flags principais do
 compilador <code>gcc</code></h3>
 <table>
@@ -626,27 +645,36 @@ compilador <code>gcc</code></h3>
 <td><code>-O</code></td>
 <td>Ativa otimização (não recomendado em fase de desenvolvimento)</td>
 </tr>
+<tr class="odd">
+<td><code>-c</code></td>
+<td>Compila <strong>apenas</strong>, parando antes da linkagem (gera
+<code>.o</code>)</td>
+</tr>
+<tr class="even">
+<td><code>-l&lt;nome&gt;</code></td>
+<td>Linka com a biblioteca <code>lib&lt;nome&gt;</code> (ex.:
+<code>-lm</code> para <code>libm</code>)</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Exemplos:</strong></p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> gcc <span class="at">-o</span> hello hello.c    <span class="co"># Cria executável &quot;hello&quot;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> gcc <span class="at">-Wall</span> hello.c       <span class="co"># Compila mostrando todos os warnings</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> gcc <span class="at">-g</span> hello.c          <span class="co"># Compila com info de debug</span></span></code></pre></div>
+<pre class="bash"><code>$ gcc -o hello hello.c    # Cria executável &quot;hello&quot;
+$ gcc -Wall hello.c       # Compila mostrando todos os warnings
+$ gcc -g hello.c          # Compila com info de debug</code></pre>
 <hr />
 <h2 id="2-tipos-de-dados">2. Tipos de Dados</h2>
 <h3 id="exemplos-de-declarações">Exemplos de declarações</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> a <span class="op">=</span> <span class="ch">&#39;A&#39;</span><span class="op">;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> b <span class="op">=</span> <span class="dv">65</span><span class="op">;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> c <span class="op">=</span> <span class="bn">0x41</span><span class="op">;</span>          <span class="co">// &#39;A&#39; em hexadecimal — todos equivalentes!</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> i <span class="op">=</span> <span class="op">-</span><span class="dv">2343234</span><span class="op">;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">int</span> ui <span class="op">=</span> <span class="dv">4294967295</span><span class="op">;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">int</span> uj <span class="op">=</span> <span class="op">((</span><span class="dt">long</span><span class="op">)</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">32</span><span class="op">)</span> <span class="op">-</span> <span class="dv">1</span><span class="op">;</span>   <span class="co">// 4294967295</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">int</span> uk <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span>                     <span class="co">// também dá 4294967295 (overflow)</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> pi <span class="op">=</span> <span class="fl">3.14</span><span class="op">;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> long_pi <span class="op">=</span> <span class="dv">0</span><span class="er">.31415e</span><span class="op">+</span><span class="dv">1</span><span class="op">;</span>              <span class="co">// = 3.1415</span></span></code></pre></div>
+<pre class="c"><code>char a = &#39;A&#39;;
+char b = 65;
+char c = 0x41;          // &#39;A&#39; em hexadecimal — todos equivalentes!
+
+int i = -2343234;
+unsigned int ui = 4294967295;
+unsigned int uj = ((long) 1 &lt;&lt; 32) - 1;   // 4294967295
+unsigned int uk = -1;                     // também dá 4294967295 (overflow)
+
+float pi = 3.14;
+double long_pi = 0.31415e+1;              // = 3.1415</code></pre>
 <h3 id="tipos-inteiros">Tipos Inteiros</h3>
 <table>
 <thead>
@@ -745,9 +773,9 @@ explícito</strong>:</p>
 </table>
 <h3 id="operador-sizeof">Operador <code>sizeof()</code></h3>
 <p>Devolve o tamanho em bytes de um tipo ou variável:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> x<span class="op">;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>printf<span class="op">(</span><span class="st">&quot;storage size for type int: </span><span class="sc">%d</span><span class="st"> bytes</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>printf<span class="op">(</span><span class="st">&quot;storage size for variable x: </span><span class="sc">%d</span><span class="st"> bytes</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>x<span class="op">));</span></span></code></pre></div>
+<pre class="c"><code>int x;
+printf(&quot;storage size for type int: %d bytes\n&quot;, sizeof(int));
+printf(&quot;storage size for variable x: %d bytes\n&quot;, sizeof(x));</code></pre>
 <h3 id="tipo-void">Tipo <code>void</code></h3>
 <p>O tipo <code>void</code> indica que <strong>não há valor
 disponível</strong> ou que o tipo é indefinido. Três usos:</p>
@@ -899,36 +927,44 @@ de bits)</h3>
 Ciclos</h2>
 <h3 id="statement-if--else">Statement <code>if</code> /
 <code>else</code></h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>cond<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// executa se cond for true</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// executa se cond for false</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>if (cond) {
+    // executa se cond for true
+} else {
+    // executa se cond for false
+}</code></pre>
 <h3 id="statement-switch">Statement <code>switch</code></h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">switch</span> <span class="op">(</span>val<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> const1<span class="op">:</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">// executa se val == const1</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> const2<span class="op">:</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// executa se val == const2</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">default</span><span class="op">:</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="co">// executa se nenhum case anterior corresponder</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>switch (val) {
+    case const1:
+        // executa se val == const1
+        break;
+    case const2:
+        // executa se val == const2
+        break;
+    default:
+        // executa se nenhum case anterior corresponder
+}</code></pre>
+<blockquote>
+<p><strong>Fall-through:</strong> se omitires <code>break</code> no fim
+de um <code>case</code>, a execução <strong>"cai"</strong> para o caso
+seguinte (continua até encontrar <code>break</code> ou o fim do
+<code>switch</code>). NÃO há <code>break</code> implícito em C —
+fall-through é comportamento legal mas frequentemente é fonte de
+bugs.</p>
+</blockquote>
 <h3 id="ciclo-for">Ciclo <code>for</code></h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>pre_cond<span class="op">;</span> cond<span class="op">;</span> post_loop<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// pre_cond executa uma vez antes</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// continua enquanto cond for true</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// post_loop executa no fim de cada iteração</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>for (pre_cond; cond; post_loop) {
+    // pre_cond executa uma vez antes
+    // continua enquanto cond for true
+    // post_loop executa no fim de cada iteração
+}</code></pre>
 <h3 id="ciclo-while">Ciclo <code>while</code></h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span>cond<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// executa enquanto cond for true</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>while (cond) {
+    // executa enquanto cond for true
+}</code></pre>
 <h3 id="ciclo-dowhile">Ciclo <code>do/while</code></h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// executa pelo menos uma vez, e continua enquanto cond for true</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span>cond<span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    // executa pelo menos uma vez, e continua enquanto cond for true
+} while (cond);</code></pre>
 <blockquote>
 <p><strong>Diferença importante:</strong> No <code>while</code>, a
 condição é testada <strong>antes</strong>; no <code>do/while</code>, é
@@ -940,11 +976,11 @@ uma vez.</p>
 <p>Um <strong>apontador</strong> é uma variável cujo valor é <strong>um
 endereço de memória</strong>.</p>
 <h3 id="declaração">Declaração</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>type<span class="op">*</span> varname<span class="op">;</span></span></code></pre></div>
+<pre class="c"><code>type* varname;</code></pre>
 <p>Exemplos:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span><span class="op">*</span>  p1<span class="op">;</span>   <span class="co">// apontador para um char</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span><span class="op">*</span>   p2<span class="op">;</span>   <span class="co">// apontador para um int</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span><span class="op">*</span> p3<span class="op">;</span>   <span class="co">// apontador para um float</span></span></code></pre></div>
+<pre class="c"><code>char*  p1;   // apontador para um char
+int*   p2;   // apontador para um int
+float* p3;   // apontador para um float</code></pre>
 <h3 id="operações-principais">Operações principais</h3>
 <ul>
 <li><code>&amp;</code> → obtém o endereço de memória de uma
@@ -953,37 +989,37 @@ variável</li>
 apontador (dereference)</li>
 </ul>
 <h3 id="exemplo-i--uso-básico">Exemplo I — uso básico</h3>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> v <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>ip<span class="op">;</span>          <span class="co">// ip contém um endereço indefinido inicialmente</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    ip <span class="op">=</span> <span class="op">&amp;</span>v<span class="op">;</span>          <span class="co">// ip passa a ter o endereço de v</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;value stored in ip: </span><span class="sc">%p\n</span><span class="st">&quot;</span><span class="op">,</span> ip<span class="op">);</span>   <span class="co">// imprime endereço</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>ip <span class="op">=</span> <span class="dv">10</span><span class="op">;</span>         <span class="co">// muda o valor de v através de ip</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;value of v: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">*</span>ip<span class="op">);</span>          <span class="co">// imprime 10</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main() {
+    int v = 0;
+    int *ip;          // ip contém um endereço indefinido inicialmente
+
+    ip = &amp;v;          // ip passa a ter o endereço de v
+
+    printf(&quot;value stored in ip: %p\n&quot;, ip);   // imprime endereço
+
+    *ip = 10;         // muda o valor de v através de ip
+
+    printf(&quot;value of v: %d\n&quot;, *ip);          // imprime 10
+    return 0;
+}</code></pre>
 <h3 id="exemplo-ii--visualização-passo-a-passo">Exemplo II —
 visualização passo a passo</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> i<span class="op">,</span> j<span class="op">,</span> <span class="op">*</span>ip<span class="op">,</span> <span class="op">*</span>ip2<span class="op">;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">// step 1</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ip <span class="op">=</span> <span class="op">&amp;</span>i<span class="op">;</span>          <span class="co">// ip aponta para i</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">// step 2</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>ip <span class="op">=</span> <span class="dv">7</span><span class="op">;</span>          <span class="co">// i passa a valer 7 (via ip)</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>j <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>ip <span class="op">=</span> <span class="op">&amp;</span>j<span class="op">;</span>          <span class="co">// ip agora aponta para j</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">// step 3</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>ip2 <span class="op">=</span> ip<span class="op">;</span>         <span class="co">// ip2 também aponta para j</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">// step 4</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>ip <span class="op">=</span> <span class="op">&amp;</span>i<span class="op">;</span>          <span class="co">// ip volta a apontar para i; ip2 continua a apontar para j</span></span></code></pre></div>
+<pre class="c"><code>int i, j, *ip, *ip2;
+
+// step 1
+i = 5;
+ip = &amp;i;          // ip aponta para i
+
+// step 2
+*ip = 7;          // i passa a valer 7 (via ip)
+j = 3;
+ip = &amp;j;          // ip agora aponta para j
+
+// step 3
+ip2 = ip;         // ip2 também aponta para j
+
+// step 4
+ip = &amp;i;          // ip volta a apontar para i; ip2 continua a apontar para j</code></pre>
 <p><strong>Estado final:</strong> <code>i = 7</code>,
 <code>j = 3</code>, <code>ip → i</code>, <code>ip2 → j</code></p>
 <hr />
@@ -996,13 +1032,13 @@ de memória</strong> e com <strong>tamanho fixo</strong>.</p>
 <li>O índice mais alto é <code>size - 1</code> (último elemento).</li>
 </ul>
 <h3 id="declaração-1">Declaração</h3>
-<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>type arrayName<span class="op">[</span>size<span class="op">];</span></span></code></pre></div>
+<pre class="c"><code>type arrayName[size];</code></pre>
 <p>Exemplos:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> cs<span class="op">[</span><span class="dv">10</span><span class="op">];</span>   <span class="co">// array de 10 chars</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>  is<span class="op">[</span><span class="dv">5</span><span class="op">];</span>    <span class="co">// array de 5 ints</span></span></code></pre></div>
+<pre class="c"><code>char cs[10];   // array de 10 chars
+int  is[5];    // array de 5 ints</code></pre>
 <h3 id="inicialização">Inicialização</h3>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> is<span class="op">[</span><span class="dv">5</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="dv">1000</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">50</span><span class="op">};</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> is<span class="op">[]</span>  <span class="op">=</span> <span class="op">{</span><span class="dv">1000</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">50</span><span class="op">};</span>   <span class="co">// tamanho inferido = 5</span></span></code></pre></div>
+<pre class="c"><code>int is[5] = {1000, 2, 3, 7, 50};
+int is[]  = {1000, 2, 3, 7, 50};   // tamanho inferido = 5</code></pre>
 <p><strong>Regras:</strong></p>
 <ul>
 <li>O número de valores entre <code>{}</code> <strong>não pode
@@ -1011,18 +1047,18 @@ exceder</strong> o tamanho declarado em <code>[]</code>.</li>
 inicialização.</li>
 </ul>
 <h3 id="exemplo">Exemplo</h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> i<span class="op">;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> n<span class="op">[</span><span class="dv">10</span><span class="op">];</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        n<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> i <span class="op">+</span> <span class="dv">100</span><span class="op">;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;element[</span><span class="sc">%d</span><span class="st">] = </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> i<span class="op">,</span> n<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main() {
+    int i;
+    int n[10];
+
+    for (i = 0; i &lt; 10; i++)
+        n[i] = i + 100;
+
+    for (i = 0; i &lt; 10; i++)
+        printf(&quot;element[%d] = %d\n&quot;, i, n[i]);
+
+    return 0;
+}</code></pre>
 <hr />
 <h2 id="7-strings">7. Strings</h2>
 <p>Uma <strong>string</strong> em C é um <strong>array de caracteres
@@ -1031,9 +1067,9 @@ terminado pelo caractere nulo</strong> <code>'\0'</code>.</p>
 <p>Para guardar o <code>'\0'</code>, o array tem de ter <strong>espaço
 para um caractere extra</strong>.</p>
 </blockquote>
-<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> greeting<span class="op">[</span><span class="dv">6</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="ch">&#39;H&#39;</span><span class="op">,</span><span class="ch">&#39;e&#39;</span><span class="op">,</span><span class="ch">&#39;l&#39;</span><span class="op">,</span><span class="ch">&#39;l&#39;</span><span class="op">,</span><span class="ch">&#39;o&#39;</span><span class="op">,</span><span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">};</span>   <span class="co">// explícito</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> greeting<span class="op">[]</span>  <span class="op">=</span> <span class="st">&quot;Hello&quot;</span><span class="op">;</span>                       <span class="co">// equivalente — &#39;\0&#39; adicionado automaticamente</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> <span class="op">*</span>greeting   <span class="op">=</span> <span class="st">&quot;Hello&quot;</span><span class="op">;</span>                       <span class="co">// apontador para string literal</span></span></code></pre></div>
+<pre class="c"><code>char greeting[6] = {&#39;H&#39;,&#39;e&#39;,&#39;l&#39;,&#39;l&#39;,&#39;o&#39;,&#39;\0&#39;};   // explícito
+char greeting[]  = &quot;Hello&quot;;                       // equivalente — &#39;\0&#39; adicionado automaticamente
+char *greeting   = &quot;Hello&quot;;                       // apontador para string literal</code></pre>
 <h3 id="funções-básicas-de-strings-stringh">Funções básicas de strings
 (<code>&lt;string.h&gt;</code>)</h3>
 <table>
@@ -1075,16 +1111,16 @@ para um caractere extra</strong>.</p>
 </tbody>
 </table>
 <h3 id="exemplo-1">Exemplo</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> str1<span class="op">[</span><span class="dv">100</span><span class="op">]</span> <span class="op">=</span> <span class="st">&quot;Hello&quot;</span><span class="op">;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> str2<span class="op">[</span><span class="dv">100</span><span class="op">]</span> <span class="op">=</span> <span class="st">&quot;World&quot;</span><span class="op">;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    strcat<span class="op">(</span>str1<span class="op">,</span> str2<span class="op">);</span>    <span class="co">// str1 passa a ser &quot;HelloWorld&quot;</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    strcpy<span class="op">(</span>str2<span class="op">,</span> str1<span class="op">);</span>    <span class="co">// str2 passa a ser &quot;HelloWorld&quot;</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;str1 length: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> strlen<span class="op">(</span>str1<span class="op">));</span>   <span class="co">// imprime 10</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main() {
+    char str1[100] = &quot;Hello&quot;;
+    char str2[100] = &quot;World&quot;;
+
+    strcat(str1, str2);    // str1 passa a ser &quot;HelloWorld&quot;
+    strcpy(str2, str1);    // str2 passa a ser &quot;HelloWorld&quot;
+
+    printf(&quot;str1 length: %d\n&quot;, strlen(str1));   // imprime 10
+    return 0;
+}</code></pre>
 <hr />
 <h2 id="8-funções--call-by-value-vs-call-by-reference">8. Funções — Call
 by Value vs Call by Reference</h2>
@@ -1096,18 +1132,18 @@ formal.</li>
 <li>Mudanças dentro da função <strong>NÃO afetam</strong> o argumento
 original.</li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> swap_call_by_value<span class="op">(</span><span class="dt">int</span> a<span class="op">,</span> <span class="dt">int</span> b<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> temp <span class="op">=</span> a<span class="op">;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> b<span class="op">;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> temp<span class="op">;</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> j <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    swap_call_by_value<span class="op">(</span>i<span class="op">,</span> j<span class="op">);</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;i: </span><span class="sc">%d</span><span class="st"> j: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> i<span class="op">,</span> j<span class="op">);</span>   <span class="co">// imprime &quot;i:1 j:2&quot; — não troca!</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>void swap_call_by_value(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int main() {
+    int i = 1, j = 2;
+    swap_call_by_value(i, j);
+    printf(&quot;i: %d j: %d\n&quot;, i, j);   // imprime &quot;i:1 j:2&quot; — não troca!
+    return 0;
+}</code></pre>
 <h3 id="call-by-reference-usando-apontadores">Call by Reference (usando
 apontadores)</h3>
 <ul>
@@ -1116,18 +1152,18 @@ apontadores)</h3>
 argumento original</strong>.</li>
 <li>Mudanças <strong>AFETAM</strong> o argumento.</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> swap_call_by_reference<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>p<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>q<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> temp <span class="op">=</span> <span class="op">*</span>p<span class="op">;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>p <span class="op">=</span> <span class="op">*</span>q<span class="op">;</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>q <span class="op">=</span> temp<span class="op">;</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> j <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    swap_call_by_reference<span class="op">(&amp;</span>i<span class="op">,</span> <span class="op">&amp;</span>j<span class="op">);</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;i: </span><span class="sc">%d</span><span class="st"> j: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> i<span class="op">,</span> j<span class="op">);</span>   <span class="co">// imprime &quot;i:2 j:1&quot; — TROCA!</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>void swap_call_by_reference(int *p, int *q) {
+    int temp = *p;
+    *p = *q;
+    *q = temp;
+}
+
+int main() {
+    int i = 1, j = 2;
+    swap_call_by_reference(&amp;i, &amp;j);
+    printf(&quot;i: %d j: %d\n&quot;, i, j);   // imprime &quot;i:2 j:1&quot; — TROCA!
+    return 0;
+}</code></pre>
 <blockquote>
 <p><strong>Resumo:</strong> Por defeito, C usa <em>call by value</em>.
 Para simular <em>call by reference</em>, passamos
@@ -1137,22 +1173,22 @@ Para simular <em>call by reference</em>, passamos
 <h2 id="9-alocação-dinâmica-de-memória">9. Alocação Dinâmica de
 Memória</h2>
 <h3 id="exemplo-errado-">Exemplo ERRADO ❌</h3>
-<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span><span class="op">*</span> get_int<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> i <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">&amp;</span>i<span class="op">;</span>        <span class="co">// ERRADO! i é local — desaparece quando a função termina</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int* get_int() {
+    int i = 2;
+    return &amp;i;        // ERRADO! i é local — desaparece quando a função termina
+}</code></pre>
 <p>A variável <code>i</code> está na <strong>stack</strong> e é
 destruída quando a função retorna. O apontador devolvido fica
 <strong>inválido</strong> (dangling pointer).</p>
 <h3 id="exemplo-correto-">Exemplo CORRETO ✅</h3>
-<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span><span class="op">*</span> get_int<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span><span class="op">*</span> p <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">*)</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span>   <span class="co">// aloca no heap</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>p <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> p<span class="op">;</span>                              <span class="co">// p continua válido após o return</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int* get_int() {
+    int* p = (int*) malloc(sizeof(int));   // aloca no heap
+    *p = 2;
+    return p;                              // p continua válido após o return
+}</code></pre>
 <p>A memória alocada com <code>malloc</code> está no
 <strong>heap</strong> e persiste até ser libertada explicitamente com
 <code>free</code>.</p>
@@ -1186,19 +1222,19 @@ dinâmica (<code>&lt;stdlib.h&gt;</code>)</h3>
 </tbody>
 </table>
 <h3 id="exemplo-completo">Exemplo completo</h3>
-<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>name <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span> malloc<span class="op">(</span><span class="dv">20</span> <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">char</span><span class="op">));</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>name <span class="op">==</span> NULL<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">// erro de alocação</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        strcpy<span class="op">(</span>name<span class="op">,</span> <span class="st">&quot;Hello world!&quot;</span><span class="op">);</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">);</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>name<span class="op">);</span>   <span class="co">// IMPORTANTE — libertar a memória</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main() {
+    char *name = (char *) malloc(20 * sizeof(char));
+
+    if (name == NULL) {
+        // erro de alocação
+    } else {
+        strcpy(name, &quot;Hello world!&quot;);
+        printf(&quot;%s\n&quot;, name);
+    }
+
+    free(name);   // IMPORTANTE — libertar a memória
+    return 0;
+}</code></pre>
 <blockquote>
 <p><strong>Boa prática:</strong> Verificar sempre se <code>malloc</code>
 devolve <code>NULL</code> (falha de alocação) e fazer sempre
@@ -1210,29 +1246,29 @@ Typedefs</h2>
 <h3 id="estruturas-struct">Estruturas (<code>struct</code>)</h3>
 <p>Permitem <strong>combinar dados de tipos diferentes</strong> num
 único tipo definido pelo utilizador.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">[</span>name<span class="op">]</span> <span class="op">{</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    type1 item1<span class="op">;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    type2 item2<span class="op">;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    typeN itemN<span class="op">;</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">[</span>variables<span class="op">];</span></span></code></pre></div>
+<pre class="c"><code>struct [name] {
+    type1 item1;
+    type2 item2;
+    ...
+    typeN itemN;
+} [variables];</code></pre>
 <h3 id="exemplo-2">Exemplo</h3>
-<div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> list_elem <span class="op">{</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> data<span class="op">;</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_elem <span class="op">*</span>next<span class="op">;</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_elem le <span class="op">=</span> <span class="op">{</span><span class="dv">10</span><span class="op">,</span> NULL<span class="op">};</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_elem<span class="op">*</span> lep <span class="op">=</span> <span class="op">&amp;</span>le<span class="op">;</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Três formas equivalentes de aceder aos campos:</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;data </span><span class="sc">%d</span><span class="st"> next </span><span class="sc">%p\n</span><span class="st">&quot;</span><span class="op">,</span> le<span class="op">.</span>data<span class="op">,</span> le<span class="op">.</span>next<span class="op">);</span>          <span class="co">// notação ponto</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;data </span><span class="sc">%d</span><span class="st"> next </span><span class="sc">%p\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(*</span>lep<span class="op">).</span>data<span class="op">,</span> <span class="op">(*</span>lep<span class="op">).</span>next<span class="op">);</span>  <span class="co">// dereference + ponto</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;data </span><span class="sc">%d</span><span class="st"> next </span><span class="sc">%p\n</span><span class="st">&quot;</span><span class="op">,</span> lep<span class="op">-&gt;</span>data<span class="op">,</span> lep<span class="op">-&gt;</span>next<span class="op">);</span>      <span class="co">// operador seta</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>struct list_elem {
+    int data;
+    struct list_elem *next;
+};
+
+int main() {
+    struct list_elem le = {10, NULL};
+    struct list_elem* lep = &amp;le;
+
+    // Três formas equivalentes de aceder aos campos:
+    printf(&quot;data %d next %p\n&quot;, le.data, le.next);          // notação ponto
+    printf(&quot;data %d next %p\n&quot;, (*lep).data, (*lep).next);  // dereference + ponto
+    printf(&quot;data %d next %p\n&quot;, lep-&gt;data, lep-&gt;next);      // operador seta
+
+    return 0;
+}</code></pre>
 <blockquote>
 <p><strong>Resumo dos acessos:</strong></p>
 <ul>
@@ -1246,28 +1282,28 @@ usada</li>
 <h3 id="typedefs">Typedefs</h3>
 <p>A keyword <code>typedef</code> permite dar <strong>um novo nome
 (alias) a um tipo</strong>.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">unsigned</span> <span class="dt">char</span> byte<span class="op">;</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>byte b1<span class="op">,</span> b2<span class="op">;</span>                 <span class="co">// equivalente a &quot;unsigned char b1, b2;&quot;</span></span></code></pre></div>
+<pre class="c"><code>typedef unsigned char byte;
+byte b1, b2;                 // equivalente a &quot;unsigned char b1, b2;&quot;</code></pre>
 <p>Também serve para nomear estruturas (muito comum):</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span>              <span class="co">// anonymous struct</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> data<span class="op">;</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_elem <span class="op">*</span>next<span class="op">;</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> list_elem<span class="op">;</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>list_elem le <span class="op">=</span> <span class="op">{</span><span class="dv">10</span><span class="op">,</span> NULL<span class="op">};</span>    <span class="co">// sem precisar de &quot;struct&quot;</span></span></code></pre></div>
+<pre class="c"><code>typedef struct {              // anonymous struct
+    int data;
+    struct list_elem *next;
+} list_elem;
+
+// ...
+list_elem le = {10, NULL};    // sem precisar de &quot;struct&quot;</code></pre>
 <hr />
 <h2 id="11-argumentos-da-linha-de-comandos">11. Argumentos da Linha de
 Comandos</h2>
 <p>A função <code>main</code> pode receber dois parâmetros para aceder
 aos argumentos da linha de comandos:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span><span class="op">*</span> argv<span class="op">[])</span> <span class="op">{</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>argc <span class="op">==</span> <span class="dv">2</span><span class="op">)</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Hello </span><span class="sc">%s</span><span class="st">!</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> argv<span class="op">[</span><span class="dv">1</span><span class="op">]);</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Hello World!</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main(int argc, char* argv[]) {
+    if (argc == 2)
+        printf(&quot;Hello %s!\n&quot;, argv[1]);
+    else
+        printf(&quot;Hello World!\n&quot;);
+    return 0;
+}</code></pre>
 <ul>
 <li><code>argc</code> (<strong>arg</strong>ument <strong>c</strong>ount)
 → número de argumentos (incluindo o nome do programa).</li>
@@ -1280,12 +1316,11 @@ passados.</li>
 </ul></li>
 </ul>
 <p><strong>Exemplo de execução:</strong></p>
-<div class="sourceCode" id="cb30"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> gcc <span class="at">-o</span> prog prog.c</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./prog</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span> World!</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./prog SdO</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span> SdO!</span></code></pre></div>
+<pre class="bash"><code>$ gcc -o prog prog.c
+$ ./prog
+Hello World!
+$ ./prog SdO
+Hello SdO!</code></pre>
 <hr />
 <h2 id="12-o-pré-processador-c">12. O Pré-processador C</h2>
 <p>O <strong>C Preprocessor</strong> <strong>não faz parte do
@@ -1343,15 +1378,15 @@ uma <strong>ferramenta de substituição de texto</strong>.</p>
 </tbody>
 </table>
 <h3 id="exemplos-típicos">Exemplos típicos</h3>
-<div class="sourceCode" id="cb31"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span><span class="pp">                                 </span><span class="co">/* header da lib I/O */</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PI </span><span class="op">((</span><span class="dt">double</span><span class="op">)</span><span class="pp"> </span><span class="fl">3.141592653589793</span><span class="op">)</span><span class="pp">            </span><span class="co">/* constante matemática */</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAX_VALUE </span><span class="dv">1000</span><span class="pp">                             </span><span class="co">/* constante do programa */</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAX</span><span class="op">(</span><span class="pp">x</span><span class="op">,</span><span class="pp">y</span><span class="op">)</span><span class="pp"> </span><span class="op">(((</span><span class="pp">x</span><span class="op">)</span><span class="pp"> </span><span class="op">&lt;</span><span class="pp"> </span><span class="op">(</span><span class="pp">y</span><span class="op">))</span><span class="pp"> </span><span class="op">?</span><span class="pp"> </span><span class="op">(</span><span class="pp">y</span><span class="op">)</span><span class="pp"> </span><span class="op">:</span><span class="pp"> </span><span class="op">(</span><span class="pp">x</span><span class="op">))</span><span class="pp">         </span><span class="co">/* função inline (macro) */</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef DEBUG                                       </span><span class="co">/* compilação condicional */</span></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;This is a debugging message</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div>
+<pre class="c"><code>#include &lt;stdio.h&gt;                                 /* header da lib I/O */
+
+#define PI ((double) 3.141592653589793)            /* constante matemática */
+#define MAX_VALUE 1000                             /* constante do programa */
+#define MAX(x,y) (((x) &lt; (y)) ? (y) : (x))         /* função inline (macro) */
+
+#ifdef DEBUG                                       /* compilação condicional */
+    printf(&quot;This is a debugging message\n&quot;);
+#endif</code></pre>
 <blockquote>
 <p><strong>Truque comum:</strong> O macro <code>MAX</code> usa
 parênteses extra à volta de <code>x</code> e <code>y</code> para evitar
@@ -1860,6 +1895,127 @@ I/O:  ── idle ── transferring ── idle ── transferring ── idl
 <p>Enquanto o I/O transfere dados, o CPU continua a executar processos
 do utilizador. Quando o I/O termina, gera uma interrupção que o CPU
 trata.</p>
+<h3 id="como-o-cpu-identifica-que-interrupt-ocorreu">Como o CPU
+identifica que interrupt ocorreu</h3>
+<ul>
+<li>Cada dispositivo tem um <strong>número único</strong> (interrupt
+request line).</li>
+<li>O CPU usa esse número como <strong>índice</strong> para o
+<strong>Interrupt Vector Table (IVT)</strong>, que mapeia número →
+endereço da ISR (interrupt service routine).</li>
+<li>A IVT está numa zona fixa de memória, definida pela arquitectura do
+CPU.</li>
+</ul>
+<h3 id="interrupt-service-routine-isr">Interrupt Service Routine
+(ISR)</h3>
+<ul>
+<li><strong>ISR = código que trata o interrupt</strong> (também chamado
+<em>interrupt handler</em>).</li>
+<li>Cada tipo de interrupt tem a sua ISR registada na IVT.</li>
+<li>Tem de ser <strong>curta e rápida</strong> — enquanto a ISR corre,
+outras tarefas estão suspensas.</li>
+</ul>
+<h3 id="polling-vs-interrupts">Polling vs Interrupts</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Polling</strong></th>
+<th><strong>Interrupts</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Como funciona</strong></td>
+<td>CPU verifica periodicamente o estado do dispositivo</td>
+<td>Dispositivo avisa o CPU quando precisa</td>
+</tr>
+<tr class="even">
+<td><strong>Custo</strong></td>
+<td>Desperdiça CPU verificando dispositivos inactivos</td>
+<td>CPU só reage quando necessário</td>
+</tr>
+<tr class="odd">
+<td><strong>Latência</strong></td>
+<td>Depende da frequência do polling</td>
+<td>Imediata</td>
+</tr>
+<tr class="even">
+<td><strong>Complexidade</strong></td>
+<td>Simples</td>
+<td>Mais complexa (handlers, IVT)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Polling</strong> é apropriado para dispositivos muito
+frequentes (ex.: drivers de alta performance).
+<strong>Interrupts</strong> são a abordagem padrão para a maioria dos
+dispositivos.</p>
+</blockquote>
+<h3 id="desactivar-interrupts-disable-interrupts">Desactivar interrupts
+(Disable Interrupts)</h3>
+<p>Por vezes o SO precisa de <strong>desactivar interrupts</strong>
+durante operações críticas:</p>
+<ul>
+<li>Para garantir <strong>execução atómica</strong> de código sensível
+(ex.: actualização de estruturas de dados do kernel).</li>
+<li>Para impedir que <strong>ISRs interfiram</strong> com operações em
+curso, evitando corrupção de estado.</li>
+<li>Para proteger <strong>secções críticas</strong> muito curtas em
+uniprocessadores (ver §65).</li>
+</ul>
+<blockquote>
+<p><strong>Cuidado:</strong> desactivar interrupts deve ser
+<strong>breve</strong> — o sistema fica "surdo" a eventos enquanto está
+desactivado. Não é exposto a programas de utilizador.</p>
+</blockquote>
+<h3 id="nested-interrupts">Nested Interrupts</h3>
+<ul>
+<li>Um <strong>nested interrupt</strong> é um interrupt que ocorre
+<strong>enquanto outro handler de interrupt está a correr</strong>.</li>
+<li>Por defeito, em sistemas modernos, ISRs são
+<strong>interrompíveis</strong> (a menos que estejam explicitamente a
+desactivar interrupts).</li>
+<li>Permite que interrupts de <strong>maior prioridade</strong> (ex.:
+timer crítico) preemptem ISRs de menor prioridade.</li>
+<li>Implica <strong>stacking</strong> dos contextos guardados — daí a
+necessidade de stack do kernel suficientemente grande.</li>
+</ul>
+<h3 id="faults-e-exceptions">Faults e Exceptions</h3>
+<ul>
+<li><strong>Fault (exception)</strong> = interrupção de software
+disparada por <strong>uma condição de erro detectada pelo CPU</strong>:
+<ul>
+<li>Divisão por zero.</li>
+<li>Acesso a página inválida (page fault).</li>
+<li>Instrução ilegal.</li>
+<li>Overflow aritmético.</li>
+</ul></li>
+<li>Diferente de <strong>trap</strong> (system call): trap é
+<strong>deliberada</strong>; fault é
+<strong>não-intencional</strong>.</li>
+<li>O SO pode tratar a fault (ex.: page fault → carregar página do
+disco) ou terminar o processo (ex.: divisão por zero → enviar
+SIGFPE).</li>
+</ul>
+<h3 id="por-que-io-passa-pelo-so">Por que I/O passa pelo SO</h3>
+<ul>
+<li>Programas de utilizador <strong>não acedem directamente</strong> a
+dispositivos de I/O.</li>
+<li>Razões:
+<ul>
+<li><strong>Protecção</strong>: impedir um programa de corromper
+hardware ou interferir com outros.</li>
+<li><strong>Abstracção</strong>: programa não precisa de conhecer
+detalhes específicos do hardware (drivers).</li>
+<li><strong>Sincronização</strong>: SO arbitra acesso quando vários
+processos querem o mesmo dispositivo.</li>
+<li><strong>Buffering/caching</strong>: SO optimiza acessos.</li>
+</ul></li>
+<li>Programas usam <strong>system calls</strong> (read, write, ioctl, …)
+que o SO traduz para operações de hardware.</li>
+</ul>
 <hr />
 <h2 id="26-dispositivos-de-io-e-dma">26. Dispositivos de I/O e DMA</h2>
 <h3 id="estrutura-device-controllers-e-device-drivers">Estrutura: Device
@@ -2240,6 +2396,115 @@ registers</strong></td>
 <p>As partes <strong>text + data + heap + stack</strong> formam o
 <strong>address-space</strong> do processo.</p>
 </blockquote>
+<h3 id="address-space-e-isolamento">Address-space e isolamento</h3>
+<ul>
+<li><strong>Cada processo tem o seu próprio address-space
+virtual</strong> isolado dos outros — protege contra interferência e
+corrupção mútua.</li>
+<li>O segmento <strong>text é read-only</strong>, podendo ser
+<strong>partilhado fisicamente</strong> entre processos do mesmo
+programa (mais memória poupada).</li>
+<li>Os segmentos <strong>data, heap e stack são privados</strong> a cada
+processo (cada um tem cópia própria).</li>
+<li>Um acesso a memória inválida (fora do address-space ou a uma página
+não mapeada) → <strong>segmentation fault</strong> (SIGSEGV) e o
+processo é terminado.</li>
+</ul>
+<h3 id="process-accounting-e-limites-de-recursos">Process Accounting e
+Limites de Recursos</h3>
+<p>O SO regista no PCB <strong>quanto recurso cada processo usa</strong>
+(CPU time, memória, I/O...) — permite:</p>
+<ul>
+<li><strong>Billing/auditoria</strong> em sistemas
+multi-utilizador.</li>
+<li><strong>Estatísticas</strong> para o scheduler.</li>
+<li><strong>Limites por processo</strong> (<code>ulimit</code> em UNIX):
+CPU time, número de ficheiros abertos, tamanho de stack, etc.</li>
+<li>Quando um processo <strong>excede um limite</strong>, o SO
+tipicamente <strong>termina-o</strong> (envia SIGXCPU, SIGXFSZ,
+etc.).</li>
+</ul>
+<h3 id="foreground-vs-background">Foreground vs Background</h3>
+<ul>
+<li><strong>Foreground</strong>: processo ligado ao terminal — recebe
+input e envia output directamente.</li>
+<li><strong>Background</strong>: processo desligado do terminal — corre
+sem bloquear o shell.</li>
+<li>Em UNIX, o shell põe um processo em background com
+<code>&amp;</code> no fim do comando: <code>./prog &amp;</code>.</li>
+<li>Internamente, o shell faz <code>fork()</code> para criar o filho e
+<strong>não chama <code>wait()</code></strong>, voltando logo a aceitar
+comandos.</li>
+</ul>
+<h3 id="daemons">Daemons</h3>
+<p>Um <strong>daemon</strong> é um processo de longa duração que corre
+em <strong>background</strong> sem interface de terminal (ex.:
+<code>sshd</code>, <code>cron</code>, <code>nginx</code>).
+Tipicamente:</p>
+<ul>
+<li>Arrancam no boot (via <code>init</code>/<code>systemd</code>).</li>
+<li>Não têm terminal de controlo.</li>
+<li>Esperam por eventos (sockets, sinais, timers) e respondem.</li>
+</ul>
+<h3 id="process-groups-e-sessions">Process Groups e Sessions</h3>
+<ul>
+<li><strong>Process group</strong>: conjunto de processos relacionados,
+identificados por <strong>PGID</strong>. Tipicamente todos os processos
+lançados pelo mesmo comando do shell.</li>
+<li><strong>Session</strong>: conjunto de process groups, identificados
+por <strong>SID</strong> — tipicamente uma sessão de login.</li>
+<li>Utilidade:
+<ul>
+<li><strong>Sinais ao grupo</strong>:
+<code>kill -SIGTERM -&lt;PGID&gt;</code> envia sinal a todos os
+processos do grupo (ex.: <code>Ctrl+C</code> envia SIGINT ao grupo de
+foreground).</li>
+<li><strong>Job control</strong> no shell.</li>
+</ul></li>
+</ul>
+<h3 id="pseudo-terminals-ptys">Pseudo-Terminals (PTYs)</h3>
+<ul>
+<li>Um <strong>PTY</strong> é um par de file descriptors que
+<strong>emula um terminal</strong> sem hardware real.</li>
+<li>Necessários para:
+<ul>
+<li><strong>Shells remotos</strong> (<code>ssh</code>) — o servidor cria
+um PTY e liga-o ao shell.</li>
+<li><strong>Terminal multiplexers</strong> (<code>tmux</code>,
+<code>screen</code>).</li>
+<li><strong>Emuladores de terminal</strong> (xterm, iTerm) — comunicam
+com o shell via PTY.</li>
+</ul></li>
+</ul>
+<h3 id="processor-binding-cpu-affinity">Processor Binding (CPU
+Affinity)</h3>
+<ul>
+<li><strong>Restringir</strong> um processo a correr apenas em
+<strong>CPUs específicos</strong> (em sistemas SMP).</li>
+<li>Linux: <code>taskset</code>, <code>sched_setaffinity()</code>.</li>
+<li>Vantagens: melhor uso de cache (não perde quando muda de CPU),
+latência previsível.</li>
+<li>Útil em sistemas real-time e em workloads críticos.</li>
+</ul>
+<h3 id="process-priority">Process Priority</h3>
+<ul>
+<li>Cada processo tem uma <strong>prioridade</strong> que influencia o
+scheduling.</li>
+<li>Em UNIX, a prioridade é ajustada via <strong>nice value</strong>
+(-20 a +19). Mais baixo = mais prioridade.</li>
+<li>O scheduler usa prioridade para decidir qual processo correr a
+seguir (ver §50).</li>
+</ul>
+<h3 id="process-spawning-e-lifetime">Process Spawning e Lifetime</h3>
+<ul>
+<li><strong>Spawning</strong> = criar um novo processo (em UNIX, via
+<code>fork()</code> + <code>exec()</code>).</li>
+<li><strong>Process lifetime</strong> vai de <strong>NEW</strong>
+(criação) até <strong>TERMINATED</strong> (saída).</li>
+<li>Um processo terminado <strong>não pode ser reiniciado</strong> —
+para "reiniciar", o pai tem de criar um novo filho
+(<code>fork()</code>).</li>
+</ul>
 <hr />
 <h2 id="30-process-control-block-pcb">30. Process Control Block
 (PCB)</h2>
@@ -2485,6 +2750,53 @@ o context switch.</li>
 por CPU — o context switch torna-se apenas mudar o ponteiro para o novo
 conjunto.</li>
 </ul>
+<h3 id="triggers-de-context-switch">Triggers de Context Switch</h3>
+<p>Um context switch é <strong>desencadeado por</strong>:</p>
+<ul>
+<li><strong>Timer interrupt</strong> (preempção): o quantum do processo
+expirou.</li>
+<li><strong>I/O syscall bloqueante</strong>: processo pede I/O e
+bloqueia.</li>
+<li><strong>Hardware interrupt</strong>: outro processo (mais
+prioritário) é acordado.</li>
+<li><strong>Voluntary yield</strong>: processo desiste do CPU
+(<code>sched_yield()</code>).</li>
+<li><strong>System call em geral</strong>: pode ou não desencadear
+switch dependendo do scheduler.</li>
+</ul>
+<blockquote>
+<p>Context switches <strong>podem ocorrer durante execução do
+kernel</strong> (kernel preemptivo) — são uma decisão do scheduler, não
+estão limitados a fronteiras de processo.</p>
+</blockquote>
+<h3 id="custo-user-vs-kernel-mode-switch">Custo: User vs Kernel Mode
+Switch</h3>
+<ul>
+<li><strong>Mode switch</strong> (user ↔︎ kernel): apenas muda mode bit +
+alguns registos. Rápido (~ns).</li>
+<li><strong>Context switch completo</strong> (entre processos): guarda
+PCB inteiro, troca address-space (TLB flush!), recarrega PCB do novo.
+Mais lento (~µs).</li>
+<li><strong>Demasiados context switches reduzem trabalho útil</strong> —
+sintoma típico de quantum mau ou demasiados processos activos
+(thrashing).</li>
+</ul>
+<h3 id="context-switch-e-scheduling">Context Switch e Scheduling</h3>
+<ul>
+<li>O <strong>scheduler decide</strong> qual processo correr; o
+<strong>dispatcher</strong> faz o context switch propriamente dito.</li>
+<li>Toda decisão de scheduling que mude o processo activo dispara um
+context switch.</li>
+</ul>
+<h3 id="context-switch-e-system-calls">Context Switch e System
+Calls</h3>
+<ul>
+<li>Uma system call por si só é um <strong>mode switch</strong> (user →
+kernel) — não necessariamente um context switch.</li>
+<li>Mas se a syscall <strong>bloquear</strong> (ex.: <code>read()</code>
+num pipe vazio) ou <strong>se o scheduler decidir preemptar</strong>,
+ocorre context switch.</li>
+</ul>
 <h3 id="diagrama-slide-9">Diagrama (slide 9)</h3>
 <pre><code>   processo P0     SO              processo P1
    executing  ──┐
@@ -2594,21 +2906,21 @@ concorrentemente</strong> a partir da instrução <strong>a seguir ao
 com os seus filhos.</li>
 </ul>
 <h3 id="padrão-típico">Padrão típico</h3>
-<div class="sourceCode" id="cb45"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="op">...</span> <span class="co">// código do pai antes do fork</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">((</span>pid <span class="op">=</span> fork<span class="op">())</span> <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// fork falhou</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// código do filho após o fork</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// código do pai após o fork</span></span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="op">...</span> <span class="co">// código comum após o fork</span></span></code></pre></div>
+<pre class="c"><code>... // código do pai antes do fork
+
+if ((pid = fork()) &lt; 0) {
+    ... // fork falhou
+} else if (pid == 0) {
+    ... // código do filho após o fork
+} else {
+    ... // código do pai após o fork
+}
+
+... // código comum após o fork</code></pre>
 <h3 id="exec"><code>exec()</code></h3>
 <p><strong>Tipicamente, depois de um <code>fork()</code>, um dos dois
 processos (pai ou filho) chama <code>exec()</code></strong>:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>execl<span class="op">(</span><span class="st">&quot;/bin/ls&quot;</span><span class="op">,</span> <span class="st">&quot;ls&quot;</span><span class="op">,</span> NULL<span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>execl(&quot;/bin/ls&quot;, &quot;ls&quot;, NULL);</code></pre>
 <p>O que <code>exec()</code> faz:</p>
 <ul>
 <li><strong>Substitui o address-space</strong> do processo (text, data,
@@ -2623,26 +2935,26 @@ separados</strong>.</li>
 </ul>
 <h3 id="exemplo-forking-de-um-comando-ls">Exemplo: forking de um comando
 <code>ls</code></h3>
-<div class="sourceCode" id="cb47"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    pid_t pid<span class="op">;</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* fork a child process */</span></span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    pid <span class="op">=</span> fork<span class="op">();</span></span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>                       <span class="co">/* erro */</span></span>
-<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>        fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Fork Failed&quot;</span><span class="op">);</span></span>
-<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>                 <span class="co">/* filho */</span></span>
-<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>        execlp<span class="op">(</span><span class="st">&quot;/bin/ls&quot;</span><span class="op">,</span> <span class="st">&quot;ls&quot;</span><span class="op">,</span> NULL<span class="op">);</span></span>
-<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span>                               <span class="co">/* pai */</span></span>
-<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>        wait<span class="op">(</span>NULL<span class="op">);</span>                      <span class="co">/* espera pelo filho */</span></span>
-<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Child Complete&quot;</span><span class="op">);</span></span>
-<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>int main()
+{
+    pid_t pid;
+
+    /* fork a child process */
+    pid = fork();
+
+    if (pid &lt; 0) {                       /* erro */
+        fprintf(stderr, &quot;Fork Failed&quot;);
+        return 1;
+    }
+    else if (pid == 0) {                 /* filho */
+        execlp(&quot;/bin/ls&quot;, &quot;ls&quot;, NULL);
+    }
+    else {                               /* pai */
+        wait(NULL);                      /* espera pelo filho */
+        printf(&quot;Child Complete&quot;);
+    }
+    return 0;
+}</code></pre>
 <h3 id="esquema-fork--exec--exit--wait">Esquema fork → exec → exit →
 wait</h3>
 <pre><code>                  parent (pid &gt; 0)
@@ -2650,6 +2962,44 @@ wait</h3>
 parent ──► pid = fork()
                   └──► exec() ──► exit()
                   child (pid = 0)</code></pre>
+<h3 id="falhas-de-fork">Falhas de <code>fork()</code></h3>
+<p><code>fork()</code> pode falhar e devolver <strong>-1</strong> quando
+o sistema esgota recursos:</p>
+<ul>
+<li><strong>Excedeu número máximo de processos</strong> no sistema
+(limite global do kernel).</li>
+<li><strong>Excedeu número máximo de processos</strong> do utilizador
+(<code>RLIMIT_NPROC</code>).</li>
+<li><strong>Memória virtual insuficiente</strong> para alocar PCB / page
+tables.</li>
+</ul>
+<p>Ou seja, <code>fork()</code> <strong>não é infalível</strong> —
+código robusto verifica o retorno antes de assumir sucesso.</p>
+<h3 id="pipes-antes-de-fork">Pipes antes de <code>fork()</code></h3>
+<p>Quando se quer criar uma <strong>pipeline</strong> (pai ↔︎ filho via
+pipe), o pipe deve ser <strong>criado ANTES de
+<code>fork()</code></strong>:</p>
+<pre class="c"><code>int fd[2];
+pipe(fd);              // cria pipe (fd[0] read, fd[1] write)
+pid_t pid = fork();    // fork DEPOIS — filho herda fd[0] e fd[1]</code></pre>
+<p><strong>Razão:</strong> <code>fork()</code> duplica os file
+descriptors abertos do pai para o filho. Se o pipe fosse criado
+<strong>depois</strong> do fork, cada um teria o seu pipe separado e não
+conseguiriam comunicar.</p>
+<h3 id="copy-on-write-cow-e-fork">Copy-on-Write (COW) e
+<code>fork()</code></h3>
+<p>Como <code>exec()</code> substitui imediatamente o address-space,
+copiar tudo no <code>fork()</code> seria desperdício.
+<strong>Copy-on-write</strong> optimiza:</p>
+<ul>
+<li>Pai e filho <strong>partilham fisicamente</strong> as mesmas páginas
+em <strong>modo read-only</strong>.</li>
+<li>Quando um deles <strong>escreve</strong> numa página, o SO duplica
+essa página específica.</li>
+<li>Se o filho fizer logo <code>exec()</code>, <strong>nenhuma página é
+realmente copiada</strong> — <code>fork()+exec()</code> torna-se quase
+grátis.</li>
+</ul>
 <hr />
 <h2 id="38-terminação-de-processos-exit-wait-zombie-orphan">38.
 Terminação de Processos (<code>exit</code>, <code>wait</code>, zombie,
@@ -2682,8 +3032,8 @@ sem pai vivo</strong> (<strong>cascading termination</strong>).</li>
 </ul>
 <h3 id="exit-e-wait-em-unixlinux"><code>exit()</code> e
 <code>wait()</code> em UNIX/Linux</h3>
-<div class="sourceCode" id="cb49"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>exit<span class="op">(</span>status<span class="op">);</span>                  <span class="co">// termina o processo com um exit status</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>pid <span class="op">=</span> wait<span class="op">(&amp;</span>status<span class="op">);</span>           <span class="co">// pai espera por um filho; devolve PID do filho terminado</span></span></code></pre></div>
+<pre class="c"><code>exit(status);                  // termina o processo com um exit status
+pid = wait(&amp;status);           // pai espera por um filho; devolve PID do filho terminado</code></pre>
 <p><code>wait()</code> permite ao pai saber <strong>qual</strong> dos
 seus filhos terminou (devolve o PID).</p>
 <h3 id="zombie-process">Zombie process</h3>
@@ -2803,11 +3153,10 @@ pipes</strong> (um em cada sentido).</li>
 </ul>
 <h3 id="pipes-na-linha-de-comandos">Pipes na linha de comandos</h3>
 <p>O carácter <code>|</code> constrói pipes:</p>
-<div class="sourceCode" id="cb51"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="kw">|</span> <span class="fu">sort</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> fich.txt <span class="kw">|</span> <span class="fu">grep</span> xpto</span></code></pre></div>
+<pre class="bash"><code>ls | sort
+cat fich.txt | grep xpto</code></pre>
 <h3 id="pipes-em-unixlinux">Pipes em UNIX/Linux</h3>
-<div class="sourceCode" id="cb52"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> pipe<span class="op">(</span><span class="dt">int</span> fd<span class="op">[</span><span class="dv">2</span><span class="op">]);</span></span></code></pre></div>
+<pre class="c"><code>int pipe(int fd[2]);</code></pre>
 <p>A system call <code>pipe()</code> cria um pipe novo e inicializa o
 array <code>fd[2]</code> com <strong>dois file descriptors</strong>:</p>
 <ul>
@@ -2846,44 +3195,44 @@ escrever.</li>
 </ul>
 <h3 id="exemplo-de-comunicação-por-pipe-pai--filho">Exemplo de
 comunicação por pipe (pai → filho)</h3>
-<div class="sourceCode" id="cb54"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define BUFFER_SIZE </span><span class="dv">25</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define READ_END    </span><span class="dv">0</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define WRITE_END   </span><span class="dv">1</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> write_msg<span class="op">[</span>BUFFER_SIZE<span class="op">]</span> <span class="op">=</span> <span class="st">&quot;Greetings&quot;</span><span class="op">;</span></span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> read_msg<span class="op">[</span>BUFFER_SIZE<span class="op">];</span></span>
-<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> fd<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
-<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    pid_t pid<span class="op">;</span></span>
-<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* cria o pipe */</span></span>
-<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pipe<span class="op">(</span>fd<span class="op">)</span> <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>        fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Pipe failed&quot;</span><span class="op">);</span></span>
-<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* fork de um filho */</span></span>
-<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>    pid <span class="op">=</span> fork<span class="op">();</span></span>
-<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a>        fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Fork Failed&quot;</span><span class="op">);</span></span>
-<span id="cb54-22"><a href="#cb54-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb54-23"><a href="#cb54-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb54-24"><a href="#cb54-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-25"><a href="#cb54-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>                                         <span class="co">/* pai */</span></span>
-<span id="cb54-26"><a href="#cb54-26" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">[</span>READ_END<span class="op">]);</span>                               <span class="co">/* fecha read-end */</span></span>
-<span id="cb54-27"><a href="#cb54-27" aria-hidden="true" tabindex="-1"></a>        write<span class="op">(</span>fd<span class="op">[</span>WRITE_END<span class="op">],</span> write_msg<span class="op">,</span> strlen<span class="op">(</span>write_msg<span class="op">)</span> <span class="op">+</span> <span class="dv">1</span><span class="op">);</span></span>
-<span id="cb54-28"><a href="#cb54-28" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">[</span>WRITE_END<span class="op">]);</span></span>
-<span id="cb54-29"><a href="#cb54-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb54-30"><a href="#cb54-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span>                                                 <span class="co">/* filho */</span></span>
-<span id="cb54-31"><a href="#cb54-31" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">[</span>WRITE_END<span class="op">]);</span>                              <span class="co">/* fecha write-end */</span></span>
-<span id="cb54-32"><a href="#cb54-32" aria-hidden="true" tabindex="-1"></a>        read<span class="op">(</span>fd<span class="op">[</span>READ_END<span class="op">],</span> read_msg<span class="op">,</span> BUFFER_SIZE<span class="op">);</span></span>
-<span id="cb54-33"><a href="#cb54-33" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;read </span><span class="sc">%s</span><span class="st">&quot;</span><span class="op">,</span> read_msg<span class="op">);</span></span>
-<span id="cb54-34"><a href="#cb54-34" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">[</span>READ_END<span class="op">]);</span></span>
-<span id="cb54-35"><a href="#cb54-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb54-36"><a href="#cb54-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-37"><a href="#cb54-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb54-38"><a href="#cb54-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>#define BUFFER_SIZE 25
+#define READ_END    0
+#define WRITE_END   1
+
+int main(void) {
+    char write_msg[BUFFER_SIZE] = &quot;Greetings&quot;;
+    char read_msg[BUFFER_SIZE];
+    int fd[2];
+    pid_t pid;
+
+    /* cria o pipe */
+    if (pipe(fd) == -1) {
+        fprintf(stderr, &quot;Pipe failed&quot;);
+        return 1;
+    }
+
+    /* fork de um filho */
+    pid = fork();
+
+    if (pid &lt; 0) {
+        fprintf(stderr, &quot;Fork Failed&quot;);
+        return 1;
+    }
+
+    if (pid &gt; 0) {                                         /* pai */
+        close(fd[READ_END]);                               /* fecha read-end */
+        write(fd[WRITE_END], write_msg, strlen(write_msg) + 1);
+        close(fd[WRITE_END]);
+    }
+    else {                                                 /* filho */
+        close(fd[WRITE_END]);                              /* fecha write-end */
+        read(fd[READ_END], read_msg, BUFFER_SIZE);
+        printf(&quot;read %s&quot;, read_msg);
+        close(fd[READ_END]);
+    }
+
+    return 0;
+}</code></pre>
 <hr />
 <h1 id="parte-iv--escalonamento-de-processos-cap-5-1">Parte IV —
 Escalonamento de Processos (Cap. 5)</h1>
@@ -2922,6 +3271,30 @@ e dá o CPU a outro processo.</li>
 consegue <strong>servir mais tarefas</strong> e <strong>tornar o
 computador mais produtivo</strong>.</li>
 </ul>
+<h3 id="hardware-timer-interrupts">Hardware Timer Interrupts</h3>
+<p>Schedulers preemptivos <strong>dependem de hardware timer
+interrupts</strong>:</p>
+<ul>
+<li>O timer dispara periodicamente (ex.: cada 4 ms).</li>
+<li>A ISR do timer dá controlo ao scheduler, que decide se preempta o
+processo actual.</li>
+<li>Sem timer hardware, o SO não consegue forçar preempção — só
+algoritmos cooperativos seriam possíveis.</li>
+</ul>
+<h3 id="real-time-scheduling">Real-Time Scheduling</h3>
+<p>Em sistemas <strong>real-time</strong>, processos têm
+<strong>deadlines</strong> que não podem ser falhados. Algoritmos
+clássicos:</p>
+<ul>
+<li><strong>Rate Monotonic (RM)</strong>: prioridade
+<strong>inversamente proporcional ao período</strong> — tarefas com
+período mais curto têm prioridade mais alta. <strong>Estática</strong>
+(atribuída uma vez).</li>
+<li><strong>Earliest Deadline First (EDF)</strong>: prioridade
+<strong>dinâmica</strong>, atribuída ao processo cujo <strong>deadline
+está mais próximo</strong>. EDF é óptimo (escalona qualquer conjunto
+factível) mas mais complexo.</li>
+</ul>
 <hr />
 <h2 id="43-ciclo-cpu-io-burst">43. Ciclo CPU-I/O Burst</h2>
 <p>A execução de um processo pode ser vista como um <strong>ciclo de CPU
@@ -2945,6 +3318,21 @@ bursts e I/O bursts</strong>:</p>
 <li>Eventualmente, o <strong>último CPU burst</strong> termina com um
 pedido de <strong>terminação</strong>.</li>
 </ul>
+<h3 id="classificação-de-processos">Classificação de Processos</h3>
+<p>Conforme a relação CPU/I/O, classificamos os processos em:</p>
+<ul>
+<li><strong>CPU-bound</strong>: gastam a maior parte do tempo a fazer
+<strong>computação</strong> (CPU bursts longos, poucos I/O bursts). Ex.:
+cálculos científicos, compressão.</li>
+<li><strong>I/O-bound</strong>: gastam a maior parte do tempo a
+<strong>esperar I/O</strong> (CPU bursts curtos, muitos I/O bursts).
+Ex.: editores de texto, navegadores.</li>
+</ul>
+<blockquote>
+<p><strong>Schedulers tipicamente favorecem processos I/O-bound</strong>
+sobre CPU-bound — porque libertam o CPU rapidamente, permitindo melhor
+throughput global e melhor responsividade.</p>
+</blockquote>
 <hr />
 <h2 id="44-decisões-de-escalonamento--preemptivo-vs-não-preemptivo">44.
 Decisões de Escalonamento — Preemptivo vs Não-Preemptivo</h2>
@@ -3488,6 +3876,32 @@ executar</strong> — ficam bloqueados indefinidamente.</p>
 <p><strong>Aging</strong> = aumentar <strong>gradualmente a
 prioridade</strong> dos processos que estão à espera há muito tempo.</p>
 </blockquote>
+<h3 id="priority-inversion">Priority Inversion</h3>
+<p><strong>Priority inversion</strong> ocorre quando um <strong>processo
+de baixa prioridade bloqueia um processo de alta prioridade</strong>
+indirectamente:</p>
+<ol type="1">
+<li>Processo de <strong>baixa</strong> prioridade (L) detém um
+lock.</li>
+<li>Processo de <strong>alta</strong> prioridade (H) tenta adquirir o
+lock e bloqueia.</li>
+<li>Processo de <strong>prioridade média</strong> (M) ganha CPU e impede
+L de correr (e portanto de libertar o lock).</li>
+<li>Resultado: H espera M, mas devia preceder M — inversão!</li>
+</ol>
+<blockquote>
+<p>Caso famoso: Mars Pathfinder (1997). Um processo de baixa prioridade
+bloqueou um processo de alta prioridade durante minutos.</p>
+</blockquote>
+<p><strong>Soluções:</strong></p>
+<ul>
+<li><strong>Priority Inheritance</strong>: o processo que detém o lock
+<strong>herda temporariamente</strong> a prioridade mais alta entre os
+bloqueados, garantindo que avança rapidamente.</li>
+<li><strong>Priority Ceiling</strong>: cada lock tem uma
+<strong>prioridade tecto</strong>; quem o adquire fica com essa
+prioridade enquanto o detém.</li>
+</ul>
 <h3 id="exemplo-4">Exemplo</h3>
 <table>
 <thead>
@@ -4013,13 +4427,13 @@ processos.</p>
 <h2 id="58-solução-1--nota-simples">58. Solução #1 — Nota simples</h2>
 <p>A ideia é deixar uma <strong>nota</strong> antes de ir comprar leite,
 para evitar que duas pessoas comprem.</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>no milk<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>no note<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>        leave note<span class="op">;</span></span>
-<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>        buy milk<span class="op">;</span></span>
-<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>        remove note<span class="op">;</span></span>
-<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>if (no milk) {
+    if (no note) {
+        leave note;
+        buy milk;
+        remove note;
+    }
+}</code></pre>
 <p><strong>Problema:</strong> ainda compra leite a mais
 ocasionalmente!</p>
 <p><strong>Cenário do problema:</strong></p>
@@ -4044,12 +4458,12 @@ por comprar.</p>
 etiquetadas</h2>
 <p>E se cada um deixasse uma <strong>nota com etiqueta</strong> (Ni do
 processo i) <strong>antes</strong> de verificar?</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>leave note Ni<span class="op">;</span></span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>no note Nj<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>no milk<span class="op">)</span></span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>        buy milk<span class="op">;</span></span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>remove note Ni<span class="op">;</span></span></code></pre></div>
+<pre class="c"><code>leave note Ni;
+if (no note Nj) {
+    if (no milk)
+        buy milk;
+}
+remove note Ni;</code></pre>
 <p><strong>Problema:</strong> é possível que <strong>nenhum dos dois
 compre leite</strong>!</p>
 <p><strong>Cenário do problema:</strong></p>
@@ -4071,14 +4485,14 @@ remove note N1;
 <h2 id="60-solução-3--notas-etiquetadas--busy-waiting">60. Solução #3 —
 Notas etiquetadas + busy waiting</h2>
 <p>Uma solução assimétrica:</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co">// P1                                // P2</span></span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>leave note N1<span class="op">;</span>                        leave note N2<span class="op">;</span></span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span>note N2<span class="op">)</span> <span class="op">{</span>        <span class="co">// X         if (no note N1) {     // Y</span></span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">do</span> nothing<span class="op">;</span>                           <span class="cf">if</span> <span class="op">(</span>no milk<span class="op">)</span></span>
-<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>                                             buy milk<span class="op">;</span></span>
-<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>no milk<span class="op">)</span>                          <span class="op">}</span></span>
-<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    buy milk<span class="op">;</span>                         remove note N2<span class="op">;</span></span>
-<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>remove note N1<span class="op">;</span></span></code></pre></div>
+<pre class="c"><code>// P1                                // P2
+leave note N1;                        leave note N2;
+while (note N2) {        // X         if (no note N1) {     // Y
+    do nothing;                           if (no milk)
+}                                             buy milk;
+if (no milk)                          }
+    buy milk;                         remove note N2;
+remove note N1;</code></pre>
 <p><strong>Como funciona:</strong></p>
 <ul>
 <li>Em <strong>X</strong>, se a nota N2 não existe, é seguro o P1
@@ -4142,14 +4556,14 @@ e antes de esse pedido ser satisfeito.</li>
 falhadas (variável <code>lock</code> e <code>turn</code>)</h2>
 <h3 id="tentativa-a--variável-lock-partilhada">Tentativa A — variável
 <code>lock</code> partilhada</h3>
-<div class="sourceCode" id="cb74"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>boolean lock <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>lock<span class="op">);</span></span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    lock <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>    lock <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>boolean lock = false;
+do {
+    while (lock);
+    lock = true;
+    // critical section
+    lock = false;
+    // non-critical section
+} while (true);</code></pre>
 <p><strong>Não funciona — não preserva mutual exclusion!</strong></p>
 <blockquote>
 <p>Entre o <code>while (lock);</code> e o <code>lock = true;</code> pode
@@ -4157,14 +4571,14 @@ haver um context switch e ambos os processos entram.</p>
 </blockquote>
 <h3 id="tentativa-b--variável-turn">Tentativa B — variável
 <code>turn</code></h3>
-<div class="sourceCode" id="cb75"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> turn <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Pi é o processo atual</span></span>
-<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>turn <span class="op">!=</span> i<span class="op">);</span></span>
-<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>    turn <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> i<span class="op">;</span></span>
-<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>int turn = 0;
+// Pi é o processo atual
+do {
+    while (turn != i);
+    // critical section
+    turn = 1 - i;
+    // non-critical section
+} while (true);</code></pre>
 <p><strong>Não funciona — não satisfaz o requisito de
 progress!</strong></p>
 <blockquote>
@@ -4197,18 +4611,18 @@ generalização para N.</li>
 <li><code>flag[2]</code> — indica se cada processo está pronto para
 entrar.</li>
 </ul>
-<div class="sourceCode" id="cb76"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> turn<span class="op">;</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>boolean flag<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="kw">false</span><span class="op">,</span> <span class="kw">false</span><span class="op">};</span></span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Pi é o processo atual, Pj é o outro</span></span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>    flag<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>    turn <span class="op">=</span> j<span class="op">;</span></span>
-<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>flag<span class="op">[</span>j<span class="op">]</span> <span class="op">&amp;&amp;</span> turn <span class="op">==</span> j<span class="op">);</span>   <span class="co">// busy waiting</span></span>
-<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>    flag<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>int turn;
+boolean flag[2] = {false, false};
+
+// Pi é o processo atual, Pj é o outro
+do {
+    flag[i] = true;
+    turn = j;
+    while (flag[j] &amp;&amp; turn == j);   // busy waiting
+    // critical section
+    flag[i] = false;
+    // non-critical section
+} while (true);</code></pre>
 <p><strong>Como funciona:</strong></p>
 <ul>
 <li>O processo <code>i</code> declara interesse
@@ -4228,9 +4642,9 @@ de Sincronização — Disable Interrupts</h2>
 <h3 id="em-uniprocessadores">Em uniprocessadores</h3>
 <p>Em sistemas com um único CPU, podíamos resolver tudo desativando
 interrupções enquanto modificamos variáveis partilhadas:</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>disable interrupts<span class="op">;</span></span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="co">// critical section</span></span>
-<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>enable interrupts<span class="op">;</span></span></code></pre></div>
+<pre class="c"><code>disable interrupts;
+// critical section
+enable interrupts;</code></pre>
 <blockquote>
 <p>O código corre <strong>sem preempção</strong> — ninguém o
 interrompe.</p>
@@ -4267,18 +4681,18 @@ multiprocessadores</strong>:</p>
 coerência de cache</strong>.</li>
 </ul>
 <h3 id="pseudocódigo">Pseudocódigo</h3>
-<div class="sourceCode" id="cb78"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>boolean test_and_set<span class="op">(</span>boolean <span class="op">*</span>target<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>    boolean temp <span class="op">=</span> <span class="op">*</span>target<span class="op">;</span></span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>target <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> temp<span class="op">;</span></span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> compare_and_swap<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>target<span class="op">,</span> <span class="dt">int</span> expected<span class="op">,</span> <span class="dt">int</span> new_val<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> temp <span class="op">=</span> <span class="op">*</span>target<span class="op">;</span></span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(*</span>target <span class="op">==</span> expected<span class="op">)</span></span>
-<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">*</span>target <span class="op">=</span> new_val<span class="op">;</span></span>
-<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> temp<span class="op">;</span></span>
-<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>boolean test_and_set(boolean *target) {
+    boolean temp = *target;
+    *target = true;
+    return temp;
+}
+
+int compare_and_swap(int *target, int expected, int new_val) {
+    int temp = *target;
+    if (*target == expected)
+        *target = new_val;
+    return temp;
+}</code></pre>
 <blockquote>
 <p><strong>Note bem:</strong> <code>test_and_set</code> devolve o valor
 antigo e mete <code>true</code>. Se devolveu <code>false</code>, o lock
@@ -4289,23 +4703,23 @@ estava livre e agora ficou reservado para nós.</p>
 Mutual Exclusion com <code>test_and_set</code> e
 <code>compare_and_swap</code></h2>
 <h3 id="com-test_and_set">Com <code>test_and_set()</code></h3>
-<div class="sourceCode" id="cb79"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>boolean lock <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>test_and_set<span class="op">(&amp;</span>lock<span class="op">));</span>   <span class="co">// espera enquanto devolver true (lock estava ocupado)</span></span>
-<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>    lock <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>boolean lock = false;
+
+do {
+    while (test_and_set(&amp;lock));   // espera enquanto devolver true (lock estava ocupado)
+    // critical section
+    lock = false;
+    // non-critical section
+} while (true);</code></pre>
 <h3 id="com-compare_and_swap">Com <code>compare_and_swap()</code></h3>
-<div class="sourceCode" id="cb80"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> lock <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>compare_and_swap<span class="op">(&amp;</span>lock<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">));</span>   <span class="co">// espera enquanto não conseguir trocar 0→1</span></span>
-<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>    lock <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>int lock = 0;
+
+do {
+    while (compare_and_swap(&amp;lock, 0, 1));   // espera enquanto não conseguir trocar 0→1
+    // critical section
+    lock = 0;
+    // non-critical section
+} while (true);</code></pre>
 <blockquote>
 <p><strong>Atenção:</strong> ambas as soluções satisfazem <strong>mutual
 exclusion</strong> e <strong>progress</strong>, mas <strong>não
@@ -4317,24 +4731,24 @@ indefinidamente.</p>
 <code>test_and_set</code></h2>
 <p>Para satisfazer também o <strong>bounded waiting</strong>, é preciso
 uma estrutura mais elaborada com um array <code>waiting[N]</code>:</p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>boolean lock <span class="op">=</span> <span class="kw">false</span><span class="op">,</span> waiting<span class="op">[</span>N<span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="kw">false</span><span class="op">,</span> <span class="op">...,</span> <span class="kw">false</span><span class="op">};</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    waiting<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>waiting<span class="op">[</span>i<span class="op">]</span> <span class="op">&amp;&amp;</span> key<span class="op">)</span></span>
-<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>        key <span class="op">=</span> test_and_set<span class="op">(&amp;</span>lock<span class="op">);</span></span>
-<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>    waiting<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>    j <span class="op">=</span> <span class="op">(</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n<span class="op">;</span></span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">((</span>j <span class="op">!=</span> i<span class="op">)</span> <span class="op">&amp;&amp;</span> waiting<span class="op">[</span>j<span class="op">]</span> <span class="op">==</span> <span class="kw">false</span><span class="op">)</span></span>
-<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> <span class="op">(</span>j <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n<span class="op">;</span></span>
-<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>j <span class="op">==</span> i<span class="op">)</span></span>
-<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>        lock <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
-<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>        waiting<span class="op">[</span>j<span class="op">]</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>boolean lock = false, waiting[N] = {false, ..., false};
+
+do {
+    waiting[i] = true;
+    key = true;
+    while (waiting[i] &amp;&amp; key)
+        key = test_and_set(&amp;lock);
+    waiting[i] = false;
+    // critical section
+    j = (i + 1) % n;
+    while ((j != i) &amp;&amp; waiting[j] == false)
+        j = (j + 1) % n;
+    if (j == i)
+        lock = false;
+    else
+        waiting[j] = false;
+    // non-critical section
+} while (true);</code></pre>
 <blockquote>
 <p>A ideia: à saída, o processo procura <strong>circularmente</strong> o
 próximo que está à espera e dá-lhe a vez (em vez de simplesmente largar
@@ -4363,21 +4777,21 @@ geralmente são implementadas com instruções atómicas de hardware.</p>
 </blockquote>
 <h3 id="implementação-básica">Implementação básica</h3>
 <p><strong>Com <code>test_and_set</code>:</strong></p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define init_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp">    </span><span class="op">{</span><span class="pp"> M </span><span class="op">=</span><span class="pp"> </span><span class="kw">false</span><span class="op">;</span><span class="pp"> </span><span class="op">}</span></span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define acquire_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp"> </span><span class="op">{</span><span class="pp"> </span><span class="cf">while</span><span class="pp"> </span><span class="op">(</span><span class="pp">test_and_set</span><span class="op">(&amp;</span><span class="pp">M</span><span class="op">));</span><span class="pp"> </span><span class="op">}</span><span class="pp">   </span><span class="co">// busy waiting</span></span>
-<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define release_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp"> </span><span class="op">{</span><span class="pp"> M </span><span class="op">=</span><span class="pp"> </span><span class="kw">false</span><span class="op">;</span><span class="pp"> </span><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>#define init_lock(M)    { M = false; }
+#define acquire_lock(M) { while (test_and_set(&amp;M)); }   // busy waiting
+#define release_lock(M) { M = false; }</code></pre>
 <p><strong>Com <code>compare_and_swap</code>:</strong></p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define init_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp">    </span><span class="op">{</span><span class="pp"> M </span><span class="op">=</span><span class="pp"> </span><span class="dv">0</span><span class="op">;</span><span class="pp"> </span><span class="op">}</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define acquire_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp"> </span><span class="op">{</span><span class="pp"> </span><span class="cf">while</span><span class="pp"> </span><span class="op">(</span><span class="pp">compare_and_swap</span><span class="op">(&amp;</span><span class="pp">M</span><span class="op">,</span><span class="pp"> </span><span class="dv">0</span><span class="op">,</span><span class="pp"> </span><span class="dv">1</span><span class="op">));</span><span class="pp"> </span><span class="op">}</span></span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define release_lock</span><span class="op">(</span><span class="pp">M</span><span class="op">)</span><span class="pp"> </span><span class="op">{</span><span class="pp"> M </span><span class="op">=</span><span class="pp"> </span><span class="dv">0</span><span class="op">;</span><span class="pp"> </span><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>#define init_lock(M)    { M = 0; }
+#define acquire_lock(M) { while (compare_and_swap(&amp;M, 0, 1)); }
+#define release_lock(M) { M = 0; }</code></pre>
 <h3 id="uso-típico">Uso típico</h3>
-<div class="sourceCode" id="cb84"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>init_lock<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>    acquire_lock<span class="op">(</span>mutex<span class="op">);</span>    <span class="co">// busy waiting</span></span>
-<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// critical section</span></span>
-<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    release_lock<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// non-critical section</span></span>
-<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>init_lock(mutex);
+do {
+    acquire_lock(mutex);    // busy waiting
+    // critical section
+    release_lock(mutex);
+    // non-critical section
+} while (true);</code></pre>
 <hr />
 <h2 id="70-busy-waiting-e-spinlocks">70. Busy Waiting e Spinlocks</h2>
 <p>Quando a solução do mutex usa <strong>busy waiting</strong>, chama-se
@@ -4435,40 +4849,40 @@ instruções atómicas (para coordenar entre CPUs).</li>
 <h2 id="72-implementação-de-mutex-em-uniprocessador">72. Implementação
 de Mutex em Uniprocessador</h2>
 <h3 id="estrutura-de-dados">Estrutura de dados</h3>
-<div class="sourceCode" id="cb85"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span>       <span class="co">// valor do mutex (FREE ou BUSY)</span></span>
-<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>    PCB <span class="op">*</span>queue<span class="op">;</span>      <span class="co">// fila de processos à espera</span></span>
-<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> mutex<span class="op">;</span></span>
-<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a>init_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>value <span class="op">=</span> FREE<span class="op">;</span></span>
-<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>queue <span class="op">=</span> EMPTY<span class="op">;</span></span>
-<span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>typedef struct {
+    int value;       // valor do mutex (FREE ou BUSY)
+    PCB *queue;      // fila de processos à espera
+} mutex;
+
+init_lock(mutex M) {
+    M.value = FREE;
+    M.queue = EMPTY;
+}</code></pre>
 <h3 id="acquire_lock"><code>acquire_lock</code></h3>
-<div class="sourceCode" id="cb86"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>acquire_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>M<span class="op">.</span>value <span class="op">==</span> BUSY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">// evita busy waiting</span></span>
-<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>current PCB<span class="op">,</span> M<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>        suspend<span class="op">();</span></span>
-<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">// o kernel reativa interrupts antes de retomar este processo</span></span>
-<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>value <span class="op">=</span> BUSY<span class="op">;</span></span>
-<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>        enable interrupts<span class="op">;</span></span>
-<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>acquire_lock(mutex M) {
+    disable interrupts;
+    if (M.value == BUSY) {
+        // evita busy waiting
+        add_to_queue(current PCB, M.queue);
+        suspend();
+        // o kernel reativa interrupts antes de retomar este processo
+    } else {
+        M.value = BUSY;
+        enable interrupts;
+    }
+}</code></pre>
 <h3 id="release_lock"><code>release_lock</code></h3>
-<div class="sourceCode" id="cb87"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>release_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>M<span class="op">.</span>queue <span class="op">!=</span> EMPTY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">// mantém o lock BUSY e acorda um processo à espera</span></span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>        PCB <span class="op">=</span> remove_from_queue<span class="op">(</span>M<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>PCB<span class="op">,</span> ready queue<span class="op">);</span></span>
-<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>value <span class="op">=</span> FREE<span class="op">;</span></span>
-<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>    enable interrupts<span class="op">;</span></span>
-<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>release_lock(mutex M) {
+    disable interrupts;
+    if (M.queue != EMPTY) {
+        // mantém o lock BUSY e acorda um processo à espera
+        PCB = remove_from_queue(M.queue);
+        add_to_queue(PCB, ready queue);
+    } else {
+        M.value = FREE;
+    }
+    enable interrupts;
+}</code></pre>
 <blockquote>
 <p><strong>Truque importante no <code>release</code>:</strong> quando há
 processos à espera, o lock continua <code>BUSY</code> e a propriedade do
@@ -4481,44 +4895,44 @@ de Mutex em Multiprocessador</h2>
 só afeta um CPU), precisamos de uma <strong>guarda atómica</strong>
 entre CPUs.</p>
 <h3 id="estrutura-de-dados-1">Estrutura de dados</h3>
-<div class="sourceCode" id="cb88"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>    boolean guard<span class="op">;</span>   <span class="co">// garante atomicidade entre CPUs</span></span>
-<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span>       <span class="co">// FREE ou BUSY</span></span>
-<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>    PCB <span class="op">*</span>queue<span class="op">;</span></span>
-<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> mutex<span class="op">;</span></span>
-<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>init_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>value <span class="op">=</span> FREE<span class="op">;</span></span>
-<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>queue <span class="op">=</span> EMPTY<span class="op">;</span></span>
-<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>typedef struct {
+    boolean guard;   // garante atomicidade entre CPUs
+    int value;       // FREE ou BUSY
+    PCB *queue;
+} mutex;
+
+init_lock(mutex M) {
+    M.guard = false;
+    M.value = FREE;
+    M.queue = EMPTY;
+}</code></pre>
 <h3 id="acquire_lock-1"><code>acquire_lock</code></h3>
-<div class="sourceCode" id="cb89"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>acquire_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>test_and_set<span class="op">(&amp;</span>M<span class="op">.</span>guard<span class="op">));</span>   <span class="co">// tempo curto de busy waiting</span></span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>M<span class="op">.</span>value <span class="op">==</span> BUSY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>current PCB<span class="op">,</span> M<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>        suspend<span class="op">();</span></span>
-<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>value <span class="op">=</span> BUSY<span class="op">;</span></span>
-<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a>        enable interrupts<span class="op">;</span></span>
-<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>acquire_lock(mutex M) {
+    disable interrupts;
+    while (test_and_set(&amp;M.guard));   // tempo curto de busy waiting
+    if (M.value == BUSY) {
+        add_to_queue(current PCB, M.queue);
+        M.guard = false;
+        suspend();
+    } else {
+        M.value = BUSY;
+        M.guard = false;
+        enable interrupts;
+    }
+}</code></pre>
 <h3 id="release_lock-1"><code>release_lock</code></h3>
-<div class="sourceCode" id="cb90"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>release_lock<span class="op">(</span>mutex M<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>test_and_set<span class="op">(&amp;</span>M<span class="op">.</span>guard<span class="op">));</span>   <span class="co">// tempo curto de busy waiting</span></span>
-<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>M<span class="op">.</span>queue <span class="op">!=</span> EMPTY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>        PCB <span class="op">=</span> remove_from_queue<span class="op">(</span>M<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>PCB<span class="op">,</span> ready queue<span class="op">);</span></span>
-<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>        M<span class="op">.</span>value <span class="op">=</span> FREE<span class="op">;</span></span>
-<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a>    M<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb90-11"><a href="#cb90-11" aria-hidden="true" tabindex="-1"></a>    enable interrupts<span class="op">;</span></span>
-<span id="cb90-12"><a href="#cb90-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>release_lock(mutex M) {
+    disable interrupts;
+    while (test_and_set(&amp;M.guard));   // tempo curto de busy waiting
+    if (M.queue != EMPTY) {
+        PCB = remove_from_queue(M.queue);
+        add_to_queue(PCB, ready queue);
+    } else {
+        M.value = FREE;
+    }
+    M.guard = false;
+    enable interrupts;
+}</code></pre>
 <blockquote>
 <p><strong>A guarda só é mantida durante a verificação/atualização da
 estrutura</strong> — daí o tempo curto de busy waiting.</p>
@@ -4565,14 +4979,14 @@ depois decrementa-o em 1.</li>
 </ul>
 <h3 id="pseudocódigo-versão-naive-com-busy-waiting">Pseudocódigo (versão
 "naive" com busy waiting)</h3>
-<div class="sourceCode" id="cb91"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>wait<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>S <span class="op">==</span> <span class="dv">0</span><span class="op">);</span>   <span class="co">// busy waiting</span></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>    S<span class="op">--;</span></span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>signal<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>    S<span class="op">++;</span></span>
-<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>wait(semaphore S) {
+    while (S == 0);   // busy waiting
+    S--;
+}
+
+signal(semaphore S) {
+    S++;
+}</code></pre>
 <blockquote>
 <p>Esta é a definição <strong>conceptual</strong>. As implementações
 reais evitam o busy waiting (ver §76).</p>
@@ -4597,74 +5011,74 @@ minimizar busy waiting:</p>
 instruções atómicas.</li>
 </ul>
 <h3 id="uniprocessador">Uniprocessador</h3>
-<div class="sourceCode" id="cb92"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span>       <span class="co">// valor do semáforo</span></span>
-<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>    PCB <span class="op">*</span>queue<span class="op">;</span>      <span class="co">// fila de processos à espera</span></span>
-<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> semaphore<span class="op">;</span></span>
-<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>init_semaphore<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>    S<span class="op">.</span>value <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>    S<span class="op">.</span>queue <span class="op">=</span> EMPTY<span class="op">;</span></span>
-<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb93"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>wait<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>S<span class="op">.</span>value <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>current PCB<span class="op">,</span> S<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>        suspend<span class="op">();</span></span>
-<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// kernel reativa interrupts antes de retomar</span></span>
-<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>value<span class="op">--;</span></span>
-<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>        enable interrupts<span class="op">;</span></span>
-<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a>signal<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb93-14"><a href="#cb93-14" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb93-15"><a href="#cb93-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>S<span class="op">.</span>queue <span class="op">!=</span> EMPTY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb93-16"><a href="#cb93-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">// mantém o valor e acorda um processo à espera</span></span>
-<span id="cb93-17"><a href="#cb93-17" aria-hidden="true" tabindex="-1"></a>        PCB <span class="op">=</span> remove_from_queue<span class="op">(</span>S<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb93-18"><a href="#cb93-18" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>PCB<span class="op">,</span> ready queue<span class="op">);</span></span>
-<span id="cb93-19"><a href="#cb93-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb93-20"><a href="#cb93-20" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>value<span class="op">++;</span></span>
-<span id="cb93-21"><a href="#cb93-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb93-22"><a href="#cb93-22" aria-hidden="true" tabindex="-1"></a>    enable interrupts<span class="op">;</span></span>
-<span id="cb93-23"><a href="#cb93-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>typedef struct {
+    int value;       // valor do semáforo
+    PCB *queue;      // fila de processos à espera
+} semaphore;
+
+init_semaphore(semaphore S) {
+    S.value = 0;
+    S.queue = EMPTY;
+}</code></pre>
+<pre class="c"><code>wait(semaphore S) {
+    disable interrupts;
+    if (S.value == 0) {
+        add_to_queue(current PCB, S.queue);
+        suspend();
+        // kernel reativa interrupts antes de retomar
+    } else {
+        S.value--;
+        enable interrupts;
+    }
+}
+
+signal(semaphore S) {
+    disable interrupts;
+    if (S.queue != EMPTY) {
+        // mantém o valor e acorda um processo à espera
+        PCB = remove_from_queue(S.queue);
+        add_to_queue(PCB, ready queue);
+    } else {
+        S.value++;
+    }
+    enable interrupts;
+}</code></pre>
 <h3 id="multiprocessador">Multiprocessador</h3>
 <p>A estrutura ganha uma <code>boolean guard</code> — tal como nos
 mutexes — e cada operação faz
 <code>while (test_and_set(&amp;S.guard));</code> antes da secção crítica
 interna.</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>    boolean guard<span class="op">;</span></span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span></span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>    PCB <span class="op">*</span>queue<span class="op">;</span></span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> semaphore<span class="op">;</span></span></code></pre></div>
-<div class="sourceCode" id="cb95"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>wait<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>test_and_set<span class="op">(&amp;</span>S<span class="op">.</span>guard<span class="op">));</span>   <span class="co">// busy waiting curto</span></span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>S<span class="op">.</span>value <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>current PCB<span class="op">,</span> S<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>        suspend<span class="op">();</span></span>
-<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>value<span class="op">--;</span></span>
-<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>        enable interrupts<span class="op">;</span></span>
-<span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb95-15"><a href="#cb95-15" aria-hidden="true" tabindex="-1"></a>signal<span class="op">(</span>semaphore S<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb95-16"><a href="#cb95-16" aria-hidden="true" tabindex="-1"></a>    disable interrupts<span class="op">;</span></span>
-<span id="cb95-17"><a href="#cb95-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>test_and_set<span class="op">(&amp;</span>S<span class="op">.</span>guard<span class="op">));</span></span>
-<span id="cb95-18"><a href="#cb95-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>S<span class="op">.</span>queue <span class="op">!=</span> EMPTY<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb95-19"><a href="#cb95-19" aria-hidden="true" tabindex="-1"></a>        PCB <span class="op">=</span> remove_from_queue<span class="op">(</span>S<span class="op">.</span>queue<span class="op">);</span></span>
-<span id="cb95-20"><a href="#cb95-20" aria-hidden="true" tabindex="-1"></a>        add_to_queue<span class="op">(</span>PCB<span class="op">,</span> ready queue<span class="op">);</span></span>
-<span id="cb95-21"><a href="#cb95-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb95-22"><a href="#cb95-22" aria-hidden="true" tabindex="-1"></a>        S<span class="op">.</span>value<span class="op">++;</span></span>
-<span id="cb95-23"><a href="#cb95-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb95-24"><a href="#cb95-24" aria-hidden="true" tabindex="-1"></a>    S<span class="op">.</span>guard <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb95-25"><a href="#cb95-25" aria-hidden="true" tabindex="-1"></a>    enable interrupts<span class="op">;</span></span>
-<span id="cb95-26"><a href="#cb95-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="c"><code>typedef struct {
+    boolean guard;
+    int value;
+    PCB *queue;
+} semaphore;</code></pre>
+<pre class="c"><code>wait(semaphore S) {
+    disable interrupts;
+    while (test_and_set(&amp;S.guard));   // busy waiting curto
+    if (S.value == 0) {
+        add_to_queue(current PCB, S.queue);
+        S.guard = false;
+        suspend();
+    } else {
+        S.value--;
+        S.guard = false;
+        enable interrupts;
+    }
+}
+
+signal(semaphore S) {
+    disable interrupts;
+    while (test_and_set(&amp;S.guard));
+    if (S.queue != EMPTY) {
+        PCB = remove_from_queue(S.queue);
+        add_to_queue(PCB, ready queue);
+    } else {
+        S.value++;
+    }
+    S.guard = false;
+    enable interrupts;
+}</code></pre>
 <blockquote>
 <p><strong>Mesmo padrão dos mutexes</strong> — guarda atómica para
 coordenar entre CPUs, fila de espera e <code>suspend()</code> para
@@ -4734,10 +5148,10 @@ fila do buffer de cada vez.</li>
 <strong>vazio</strong>, o consumer tem de esperar pelo producer.</li>
 </ol>
 <h3 id="solução-com-semáforos">Solução com semáforos</h3>
-<div class="sourceCode" id="cb98"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n<span class="op">;</span>                              <span class="co">// número de buffers</span></span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>semaphore mutex <span class="op">=</span> <span class="dv">1</span><span class="op">;</span>                <span class="co">// mutual exclusion no buffer</span></span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>semaphore empty <span class="op">=</span> n<span class="op">;</span>                <span class="co">// número de buffers vazios</span></span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>semaphore full  <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>                <span class="co">// número de buffers cheios</span></span></code></pre></div>
+<pre class="c"><code>int n;                              // número de buffers
+semaphore mutex = 1;                // mutual exclusion no buffer
+semaphore empty = n;                // número de buffers vazios
+semaphore full  = 0;                // número de buffers cheios</code></pre>
 <p><strong>Ideia chave:</strong></p>
 <ul>
 <li><strong>Um semáforo por restrição.</strong></li>
@@ -4746,24 +5160,23 @@ como o producer a "produzir" full buffers para o consumer, ou o consumer
 a "produzir" empty buffers para o producer.</li>
 </ul>
 <h3 id="producer">Producer</h3>
-<div class="sourceCode" id="cb99"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* produce an item in next_produced */</span></span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>empty<span class="op">);</span>          <span class="co">// espera por um buffer vazio</span></span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>mutex<span class="op">);</span>          <span class="co">// entra na critical section</span></span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* add next_produced to the buffer */</span></span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>mutex<span class="op">);</span>        <span class="co">// sai da critical section</span></span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>full<span class="op">);</span>         <span class="co">// mais um buffer cheio disponível</span></span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    /* produce an item in next_produced */
+    wait(empty);          // espera por um buffer vazio
+    wait(mutex);          // entra na critical section
+    /* add next_produced to the buffer */
+    signal(mutex);        // sai da critical section
+    signal(full);         // mais um buffer cheio disponível
+} while (true);</code></pre>
 <h3 id="consumer">Consumer</h3>
-<div class="sourceCode" id="cb100"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>full<span class="op">);</span>           <span class="co">// espera por um buffer cheio</span></span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>mutex<span class="op">);</span>          <span class="co">// entra na critical section</span></span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* remove an item from buffer to next_consumed */</span></span>
-<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>empty<span class="op">);</span>        <span class="co">// mais um buffer vazio disponível</span></span>
-<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* consume the item in next_consumed */</span></span>
-<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    wait(full);           // espera por um buffer cheio
+    wait(mutex);          // entra na critical section
+    /* remove an item from buffer to next_consumed */
+    signal(mutex);
+    signal(empty);        // mais um buffer vazio disponível
+    /* consume the item in next_consumed */
+} while (true);</code></pre>
 <h3 id="pontos-de-discussão">Pontos de discussão</h3>
 <ul>
 <li><strong>A ordem dos <code>wait()</code> é importante?</strong>
@@ -4815,10 +5228,9 @@ readers</strong>.</li>
 I</strong>.</p>
 </blockquote>
 <h3 id="solução-variação-i">Solução (Variação I)</h3>
-<div class="sourceCode" id="cb101"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>semaphore rw_mutex <span class="op">=</span> <span class="dv">1</span><span class="op">;</span>     <span class="co">// mutual exclusion para writers</span></span>
-<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>semaphore mutex   <span class="op">=</span> <span class="dv">1</span><span class="op">;</span>      <span class="co">// mutual exclusion ao atualizar read_count</span></span>
-<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> read_count    <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>      <span class="co">// número de readers atualmente a ler</span></span></code></pre></div>
+<pre class="c"><code>semaphore rw_mutex = 1;     // mutual exclusion para writers
+semaphore mutex   = 1;      // mutual exclusion ao atualizar read_count
+int read_count    = 0;      // número de readers atualmente a ler</code></pre>
 <p><strong>Ideia chave:</strong></p>
 <ul>
 <li>Se um writer está na critical section e há N readers à espera,
@@ -4828,29 +5240,27 @@ outros N-1 ficam em fila no <code>mutex</code>.</li>
 reader em espera ou um writer (à escolha do scheduler).</li>
 </ul>
 <h3 id="writer">Writer</h3>
-<div class="sourceCode" id="cb102"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>rw_mutex<span class="op">);</span></span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* writing is performed */</span></span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>rw_mutex<span class="op">);</span></span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    wait(rw_mutex);
+    /* writing is performed */
+    signal(rw_mutex);
+} while (true);</code></pre>
 <h3 id="reader">Reader</h3>
-<div class="sourceCode" id="cb103"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>    read_count<span class="op">++;</span></span>
-<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>read_count <span class="op">==</span> <span class="dv">1</span><span class="op">)</span></span>
-<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>        wait<span class="op">(</span>rw_mutex<span class="op">);</span>     <span class="co">// primeiro reader fecha a porta aos writers</span></span>
-<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb103-8"><a href="#cb103-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* reading is performed */</span></span>
-<span id="cb103-9"><a href="#cb103-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb103-10"><a href="#cb103-10" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb103-11"><a href="#cb103-11" aria-hidden="true" tabindex="-1"></a>    read_count<span class="op">--;</span></span>
-<span id="cb103-12"><a href="#cb103-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>read_count <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
-<span id="cb103-13"><a href="#cb103-13" aria-hidden="true" tabindex="-1"></a>        signal<span class="op">(</span>rw_mutex<span class="op">);</span>   <span class="co">// último reader abre a porta aos writers</span></span>
-<span id="cb103-14"><a href="#cb103-14" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>mutex<span class="op">);</span></span>
-<span id="cb103-15"><a href="#cb103-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    wait(mutex);
+    read_count++;
+    if (read_count == 1)
+        wait(rw_mutex);     // primeiro reader fecha a porta aos writers
+    signal(mutex);
+
+    /* reading is performed */
+
+    wait(mutex);
+    read_count--;
+    if (read_count == 0)
+        signal(rw_mutex);   // último reader abre a porta aos writers
+    signal(mutex);
+} while (true);</code></pre>
 <blockquote>
 <p><strong>Ideia central:</strong> o <strong>primeiro reader</strong> é
 o que disputa o <code>rw_mutex</code> com os writers; o <strong>último
@@ -4881,8 +5291,7 @@ próximos</strong> (um de cada vez).</li>
 <li>Quando termina, larga ambos e volta a pensar.</li>
 </ul>
 <h3 id="solução-com-semáforos-1">Solução com semáforos</h3>
-<div class="sourceCode" id="cb104"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>semaphore chopstick<span class="op">[</span><span class="dv">5</span><span class="op">];</span>   <span class="co">// (todos inicializados a 1)</span></span></code></pre></div>
+<pre class="c"><code>semaphore chopstick[5];   // (todos inicializados a 1)</code></pre>
 <p><strong>Ideia chave:</strong></p>
 <ul>
 <li>Para agarrar um pauzinho, o filósofo faz <code>wait()</code> no
@@ -4890,15 +5299,14 @@ semáforo correspondente.</li>
 <li>Para o largar, faz <code>signal()</code>.</li>
 </ul>
 <h3 id="código-filósofo-i">Código (filósofo <code>i</code>)</h3>
-<div class="sourceCode" id="cb105"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="op">{</span></span>
-<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>chopstick<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">(</span>chopstick<span class="op">[(</span>i<span class="op">+</span><span class="dv">1</span><span class="op">)</span> <span class="op">%</span> <span class="dv">5</span><span class="op">]);</span></span>
-<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* eat for awhile */</span></span>
-<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>chopstick<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>    signal<span class="op">(</span>chopstick<span class="op">[(</span>i<span class="op">+</span><span class="dv">1</span><span class="op">)</span> <span class="op">%</span> <span class="dv">5</span><span class="op">]);</span></span>
-<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* think for awhile */</span></span>
-<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">);</span></span></code></pre></div>
+<pre class="c"><code>do {
+    wait(chopstick[i]);
+    wait(chopstick[(i+1) % 5]);
+    /* eat for awhile */
+    signal(chopstick[i]);
+    signal(chopstick[(i+1) % 5]);
+    /* think for awhile */
+} while (true);</code></pre>
 <h3 id="problema-deadlock">Problema: deadlock!</h3>
 <blockquote>
 <p><strong>O que acontece se todos ficarem com fome ao mesmo
@@ -5355,22 +5763,29 @@ incluir o <strong>número de rollbacks</strong> no fator de custo.</li>
 <h3 id="parte-i--linguagem-c--coisas-para-nunca-esquecer">Parte I —
 Linguagem C — coisas para nunca esquecer</h3>
 <ol type="1">
+<li><strong>4 fases de compilação:</strong> Pré-processador → Compilador
+→ Linker → Loader (P-C-L-L).</li>
+<li><strong>Flags gcc:</strong> <code>-o</code> nome, <code>-Wall</code>
+warnings, <code>-g</code> debug, <code>-c</code> só compilar (sem link),
+<code>-l&lt;lib&gt;</code> linkar biblioteca.</li>
 <li><strong>C usa call by value por defeito</strong> — para alterar
 variáveis dentro de funções, passa apontadores.</li>
-<li><strong><code>'\0'</code> no fim das strings</strong> — sempre
-alocar 1 byte extra.</li>
+<li><strong>Byte zero (<code>\0</code>) no fim das strings</strong> —
+sempre alocar 1 byte extra.</li>
 <li><strong><code>malloc</code> no heap, variáveis locais na
 stack</strong> — não devolver apontadores para variáveis locais.</li>
 <li><strong>Sempre fazer <code>free</code></strong> após
-<code>malloc</code>.</li>
-<li><strong>Verificar se <code>malloc</code> devolveu
+<code>malloc</code>. <strong>Verificar se <code>malloc</code> devolveu
 <code>NULL</code></strong>.</li>
 <li><strong>Operador <code>-&gt;</code> para campos via
 apontador</strong>, <code>.</code> para campo direto.</li>
+<li><strong>Switch sem <code>break</code> → fall-through</strong> (NÃO
+há break implícito).</li>
 <li><strong>Pré-processador faz substituição de texto</strong> antes da
 compilação.</li>
 <li><strong>Linkagem estática = tudo no binário</strong>; dinâmica =
-carregada em runtime.</li>
+carregada em runtime. Linker é "inteligente" — só inclui <code>.o</code>
+realmente usados.</li>
 <li><strong><code>argc</code> inclui o nome do programa</strong>, por
 isso <code>argc == 1</code> quando não há argumentos.</li>
 <li><strong><code>if (cond)</code> em C: <code>0</code> ou
@@ -5384,6 +5799,8 @@ verdadeiro.</strong></li>
 programas.</li>
 <li><strong>4 componentes principais:</strong> processos, memória,
 armazenamento, I/O.</li>
+<li><strong>Foco do SO depende do tipo:</strong> mainframe→utilização;
+PC→ease of use; mobile→bateria; embedded→autonomia.</li>
 <li><strong>Multiprogramming</strong> maximiza <strong>utilização do
 CPU</strong>; <strong>Multitasking</strong> maximiza <strong>tempo de
 resposta</strong>.</li>
@@ -5391,9 +5808,17 @@ resposta</strong>.</li>
 system processes (ex.: <code>init</code>).</li>
 <li><strong>Interrupções:</strong> podem vir do
 <strong>hardware</strong> (sinal ao CPU) ou do <strong>software</strong>
-(system call).</li>
+(system call ou fault).</li>
 <li><strong>Interrupt vector</strong> guarda os endereços das ISRs
 (interrupt service routines).</li>
+<li><strong>Polling vs interrupts:</strong> polling desperdiça CPU;
+interrupts são event-driven.</li>
+<li><strong>Disable interrupts</strong> = ferramenta para garantir
+atomicidade em código kernel curto.</li>
+<li><strong>Nested interrupts:</strong> ISRs podem ser interrompidas por
+interrupts mais prioritários.</li>
+<li><strong>Faults (exceptions):</strong> divisão por zero, page fault,
+instrução ilegal — interrupção de software disparada por erro.</li>
 <li><strong>Device controller</strong> = hardware; <strong>device
 driver</strong> = software (interface uniforme para o SO).</li>
 <li><strong>DMA</strong> evita ter o CPU envolvido em cada byte →
@@ -5416,18 +5841,30 @@ Processos — coisas para nunca esquecer</h3>
 <li><strong>Processo = programa em execução</strong> (entidade ativa).
 Programa = entidade passiva.</li>
 <li><strong>Address-space</strong> = text + data + heap + stack.
-<strong>PCB</strong> = state, PID, PC, registers, scheduling info,
-memory info, I/O info.</li>
+<strong>TEXT é read-only e partilhável</strong>; data/heap/stack
+privados.</li>
+<li><strong>PCB</strong> = state, PID, PC, registers, scheduling info,
+memory info, I/O info, accounting.</li>
 <li><strong>5 estados:</strong> new, ready, running, waiting/blocked,
 terminated. <strong>Só um running por CPU</strong>.</li>
 <li><strong>Transições:</strong> <code>TI</code> (running→ready),
 <code>I/O</code> (running→waiting), <code>HI</code> (waiting→ready),
-<code>dispatch</code> (ready→running).</li>
+<code>dispatch</code> (ready→running). NÃO há waiting→running
+directo.</li>
 <li><strong>Context switch é puro overhead</strong> — guarda PCB do
-antigo, carrega PCB do novo.</li>
+antigo, carrega PCB do novo. Triggers: timer, syscall bloqueante,
+interrupt, voluntary yield.</li>
+<li><strong>Mode switch (user↔︎kernel) ≠ context switch</strong>: mode
+switch é mais leve (só mode bit + alguns regs).</li>
 <li><strong><code>fork()</code></strong> retorna <strong>0 no
 filho</strong> e <strong>PID do filho no pai</strong>. Filho começa como
-cópia do pai.</li>
+cópia do pai. <strong>Pode falhar</strong> (-1) se sistema esgotar
+recursos.</li>
+<li><strong>Pipes antes de <code>fork()</code></strong> — para o filho
+herdar os file descriptors do pipe.</li>
+<li><strong>Copy-on-write (COW)</strong>: pai e filho partilham páginas
+read-only; só são copiadas no primeiro write. Torna
+<code>fork()+exec()</code> quase grátis.</li>
 <li><strong><code>exec()</code></strong> substitui o address-space mas
 <strong>mantém o PCB</strong> (mesmo PID).</li>
 <li><strong><code>wait()</code></strong> no pai recolhe o exit status do
@@ -5437,6 +5874,11 @@ filho e o seu PID.</li>
 → adotado pelo <code>init</code>.</li>
 <li><strong>Cascading termination</strong>: alguns SO matam os filhos
 quando o pai sai.</li>
+<li><strong>Process groups e sessions:</strong> para aplicar sinais/I/O
+ao grupo (ex.: <code>Ctrl+C</code> envia SIGINT ao grupo de
+foreground).</li>
+<li><strong>Daemon</strong> = processo de longa duração em background,
+sem terminal.</li>
 <li><strong>2 modelos de IPC:</strong> <strong>message passing</strong>
 (kernel intervém, funciona em rede) e <strong>shared memory</strong>
 (mais rápido, problemas de sincronização).</li>
@@ -5448,8 +5890,11 @@ Filho <strong>herda</strong> os file descriptors após
 <h3 id="parte-iv--escalonamento--coisas-para-nunca-esquecer">Parte IV —
 Escalonamento — coisas para nunca esquecer</h3>
 <ol type="1">
-<li><strong>Execução = ciclos CPU burst + I/O burst</strong>. O
-scheduling preocupa-se com o <strong>próximo CPU burst</strong>.</li>
+<li><strong>Execução = ciclos CPU burst + I/O burst</strong>.
+<strong>CPU-bound</strong> (bursts longos) vs <strong>I/O-bound</strong>
+(bursts curtos). Schedulers tipicamente favorecem I/O-bound.</li>
+<li><strong>Hardware timer interrupts</strong> são essenciais para
+scheduling preemptivo.</li>
 <li><strong>Não-preemptivo</strong> = só decide nas situações 1 e 4
 (running→waiting e termina). <strong>Preemptivo</strong> = decide nas 4
 situações.</li>
@@ -5468,6 +5913,10 @@ típico.</li>
 <li><strong>Priority scheduling:</strong> maior prioridade ganha. Risco
 de <strong>starvation</strong> → mitigar com
 <strong>aging</strong>.</li>
+<li><strong>Priority inversion:</strong> baixa prioridade detém lock →
+alta prioridade fica bloqueada → média prioridade preempta a baixa.
+Solução: <strong>priority inheritance</strong> ou <strong>priority
+ceiling</strong>.</li>
 <li><strong>MLQ:</strong> filas separadas, processos
 <strong>fixos</strong> numa fila. Cada fila com seu algoritmo. Sched
 entre filas: fixed priority ou time slice.</li>
@@ -5481,6 +5930,10 @@ na prática.</li>
 deixar de ser a mais injustamente tratada</strong> (vruntime ≥ outra).
 <strong>Target latency</strong> garante que cada task corre pelo menos
 uma vez.</li>
+<li><strong>Real-time scheduling:</strong> <strong>Rate
+Monotonic</strong> (prioridade fixa, inversa ao período) e
+<strong>Earliest Deadline First</strong> (prioridade dinâmica, deadline
+mais próximo).</li>
 <li><strong>Cálculos de waiting time:</strong>
 <code>WT = tempo na ready queue</code> (não conta tempo a executar nem
 em I/O). Para cada processo:
@@ -5601,6 +6054,7 @@ FCUP</i></sub></p>
 </table>
 
 </div>
+
 
 <a href="#" class="back-to-top" id="backToTop" title="Voltar ao topo">↑</a>
 <script>

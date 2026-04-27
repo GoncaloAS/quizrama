@@ -88,10 +88,15 @@ body {
   grid-row:2;
   border-right:1px solid var(--border);
   padding:16px 14px;
-  overflow-y:auto;
+  overflow:hidden;
   position:sticky;top:55px;height:calc(100vh - 55px);
   display:flex;flex-direction:column;gap:10px;
 }
+/* Topic-section grows/shrinks; others stay natural size */
+.s-section{flex-shrink:0;}
+.s-topic-section{flex:1 1 auto;min-height:140px;display:flex;flex-direction:column;}
+.s-topic-section .s-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.s-topic-section .s-body.hidden{display:none;}
 .s-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .s-header{
   display:flex;align-items:center;justify-content:space-between;
@@ -105,7 +110,18 @@ body {
 .s-body.hidden{display:none;}
 
 /* TOPIC FILTER */
-.topic-list{display:flex;flex-direction:column;gap:4px;}
+.topic-list{
+  display:flex;flex-direction:column;gap:4px;
+  flex:1;min-height:0;
+  overflow-y:auto;
+  padding-right:4px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.15) transparent;
+}
+.topic-list::-webkit-scrollbar{width:6px;}
+.topic-list::-webkit-scrollbar-track{background:transparent;}
+.topic-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px;}
+.topic-list::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25);}
 .tbtn{
   display:flex;align-items:center;justify-content:space-between;
   padding:5px 8px;border-radius:7px;border:1px solid transparent;
@@ -256,7 +272,7 @@ body {
 .rscore{
   font-size:5rem;font-weight:800;line-height:1;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
 .rgrade{font-size:2.5rem;font-weight:800;margin:16px 0 6px;}
 .rsub{color:var(--muted);font-size:.88rem;margin-bottom:24px;}
@@ -322,7 +338,7 @@ body {
   .sidebar-close-title{
     font-size:.8rem;font-weight:800;letter-spacing:.04em;
     background:linear-gradient(135deg,#5b8af0,#a78bfa);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   }
   .sidebar-close-btn{
     background:rgba(255,255,255,.05);border:1px solid var(--border2);
@@ -473,7 +489,7 @@ body {
     <button class="sidebar-close-btn" onclick="toggleSidebar()" aria-label="Close menu">✕</button>
   </div>
 
-  <div class="s-section">
+  <div class="s-section s-topic-section">
     <div class="s-header open" onclick="toggleSection(this)">
       <span>📚 Filter Topic</span><span>▾</span>
     </div>
@@ -540,7 +556,7 @@ body {
     <button class="btn" onclick="prev()">← Prev <span class="kbd">←</span></button>
     <button class="btn primary" onclick="next()">Next → <span class="kbd">→</span></button>
     <button class="btn" onclick="skip()">Skip <span class="kbd">S</span></button>
-    <button class="btn warn" onclick="retryWrong()">↺ Retry Wrong <span class="kbd">R</span></button>
+    <button class="btn warn" onclick="retryWrong()">↻ Refazer secção <span class="kbd">R</span></button>
     <div class="nav-spacer"></div>
     <button class="btn danger" onclick="confirmReset()">Reset All</button>
   </div>
@@ -589,17 +605,33 @@ document.addEventListener('keydown', function(e){
 });
 
 const TOPIC_COLORS = {
-  "Scheduling":        {color:"#38bdf8",bg:"rgba(56,189,248,.12)"},
-  "Synchronization":   {color:"#a78bfa",bg:"rgba(167,139,250,.12)"},
-  "Deadlocks":         {color:"#fb923c",bg:"rgba(251,146,60,.12)"},
-  "Memory Management": {color:"#34d399",bg:"rgba(52,211,153,.12)"},
-  "File Systems":      {color:"#fbbf24",bg:"rgba(251,191,36,.12)"},
-  "I/O Systems":       {color:"#f472b6",bg:"rgba(244,114,182,.12)"},
-  "Processes":         {color:"#60a5fa",bg:"rgba(96,165,250,.12)"},
-  "IPC":               {color:"#c084fc",bg:"rgba(192,132,252,.12)"},
-  "System Calls":      {color:"#4ade80",bg:"rgba(74,222,128,.12)"},
-  "Security":          {color:"#f87171",bg:"rgba(248,113,113,.12)"},
-  "General OS":        {color:"#94a3b8",bg:"rgba(148,163,184,.12)"},
+  "Scheduling":         {color:"#38bdf8",bg:"rgba(56,189,248,.12)"},
+  "Synchronization":    {color:"#a78bfa",bg:"rgba(167,139,250,.12)"},
+  "Deadlocks":          {color:"#fb923c",bg:"rgba(251,146,60,.12)"},
+  "Memory Management":  {color:"#34d399",bg:"rgba(52,211,153,.12)"},
+  "File Systems":       {color:"#fbbf24",bg:"rgba(251,191,36,.12)"},
+  "I/O Systems":        {color:"#f472b6",bg:"rgba(244,114,182,.12)"},
+  "Processes":          {color:"#60a5fa",bg:"rgba(96,165,250,.12)"},
+  "IPC":                {color:"#c084fc",bg:"rgba(192,132,252,.12)"},
+  "System Calls":       {color:"#4ade80",bg:"rgba(74,222,128,.12)"},
+  "Security":           {color:"#f87171",bg:"rgba(248,113,113,.12)"},
+  "General OS":         {color:"#94a3b8",bg:"rgba(148,163,184,.12)"},
+  "Linguagem C":        {color:"#5b8af0",bg:"rgba(91,138,240,.12)"},
+  "Conceitos Básicos":  {color:"#22c55e",bg:"rgba(34,197,94,.12)"},
+  "I/O e Interrupções": {color:"#f472b6",bg:"rgba(244,114,182,.12)"},
+  "Processos":          {color:"#f59e0b",bg:"rgba(245,158,11,.12)"},
+  "Escalonamento":      {color:"#38bdf8",bg:"rgba(56,189,248,.12)"},
+  "Sincronização":      {color:"#a78bfa",bg:"rgba(167,139,250,.12)"},
+  "Treino · fork()":     {color:"#ef4444",bg:"rgba(239,68,68,.15)"},
+  "Treino · Pipes":      {color:"#ef4444",bg:"rgba(239,68,68,.15)"},
+  "Treino · Scheduling": {color:"#ef4444",bg:"rgba(239,68,68,.15)"},
+  "Treino · Sinais":     {color:"#ef4444",bg:"rgba(239,68,68,.15)"},
+  "Exame · Parte I":    {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  "Exame · Parte II":   {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  "Exame · Parte III":  {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  "Exame · Parte IV":   {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  "Exame · Parte V":    {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  "Exame · Parte VI":   {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
 };
 const tc = t => (TOPIC_COLORS[t]||TOPIC_COLORS["General OS"]).color;
 const tb = t => (TOPIC_COLORS[t]||TOPIC_COLORS["General OS"]).bg;
@@ -618,7 +650,7 @@ function shuffle(arr){
 
 function init(){
   state.questionOrder = shuffle([...Array(ALL.length).keys()]);
-  state.optionOrder   = ALL.map(()=>shuffle([0,1,2,3]));
+  state.optionOrder   = ALL.map(()=>[0,1,2,3]); // not shuffled — explanations reference (A)/(B)/(C)/(D) by original order
   state.results       = Array(ALL.length).fill(null);
   state.index=0; state.topicErrors={}; state.streak=0;
   state.filter=null;
@@ -636,7 +668,29 @@ function buildTopicFilter(){
   const allBtn=mkTBtn("All Topics",ALL.length,null,"#5b8af0");
   allBtn.classList.add("active");
   list.appendChild(allBtn);
-  Object.keys(topics).sort().forEach(t=>list.appendChild(mkTBtn(t,topics[t],t,tc(t))));
+  const TOPIC_ORDER=['Linguagem C','Conceitos Básicos','I/O e Interrupções','System Calls','Processos','IPC','Escalonamento','Sincronização','Deadlocks','Treino · fork()','Treino · Pipes','Treino · Scheduling','Treino · Sinais','Exame · Parte I','Exame · Parte II','Exame · Parte III','Exame · Parte IV','Exame · Parte V','Exame · Parte VI'];
+  const ordered=Object.keys(topics).sort((a,b)=>{
+    const ia=TOPIC_ORDER.indexOf(a),ib=TOPIC_ORDER.indexOf(b);
+    return (ia<0?999:ia)-(ib<0?999:ib);
+  });
+  let firstTreino=true,firstExam=true;
+  ordered.forEach(t=>{
+    if(t.startsWith("Treino ·") && firstTreino){
+      const sep=document.createElement("div");
+      sep.style.cssText="margin:10px 8px 6px;font-size:.7rem;letter-spacing:2px;color:#888;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;";
+      sep.textContent="🎯 Treino estilo exame";
+      list.appendChild(sep);
+      firstTreino=false;
+    }
+    if(t.startsWith("Exame ·") && firstExam){
+      const sep=document.createElement("div");
+      sep.style.cssText="margin:10px 8px 6px;font-size:.7rem;letter-spacing:2px;color:#888;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;";
+      sep.textContent="📝 Exames anteriores";
+      list.appendChild(sep);
+      firstExam=false;
+    }
+    list.appendChild(mkTBtn(t,topics[t],t,tc(t)));
+  });
 }
 
 function mkTBtn(label,count,filter,color){
@@ -695,9 +749,10 @@ function render(){
   document.getElementById("tIdx").textContent=fp+1;
   document.getElementById("tTot").textContent=ftot;
 
-  // progress
-  const answered=state.results.filter(r=>r).length;
-  document.getElementById("pfill").style.width=(answered/ALL.length*100)+"%";
+  // progress — within current filter (or overall when no filter)
+  const answeredInFilter=state.filteredOrder.filter(p=>state.results[state.questionOrder[p]]).length;
+  const totalInFilter=state.filteredOrder.length;
+  document.getElementById("pfill").style.width=(totalInFilter?(answeredInFilter/totalInFilter*100):0)+"%";
 
   // question
   document.getElementById("qtext").innerHTML=q[2];
@@ -775,17 +830,18 @@ function updateStats(){
   const circ=Math.PI*2*16;
   document.getElementById("ringFill").setAttribute("stroke-dasharray",`${(pct/100)*circ} ${circ}`);
 
-  // wrong list
+  // wrong list — iterate by position (questionOrder) so jumpTo gets a valid pos
   let wHTML="";
-  state.results.forEach((r,i)=>{
+  for(let pos=0;pos<state.questionOrder.length;pos++){
+    const qIdx=state.questionOrder[pos];
+    const r=state.results[qIdx];
     if(r&&!r.correct){
-      const qi=state.questionOrder[i];
-      wHTML+=`<div class="wrong-item" onclick="jumpTo(${i})">
-        <div><span class="wtag">${ALL[qi][0]}</span></div>
-        ${ALL[qi][2].substring(0,75)}${ALL[qi][2].length>75?"…":""}
+      wHTML+=`<div class="wrong-item" onclick="jumpTo(${pos})">
+        <div><span class="wtag">${ALL[qIdx][0]}</span></div>
+        ${ALL[qIdx][2].substring(0,75)}${ALL[qIdx][2].length>75?"…":""}
       </div>`;
     }
-  });
+  }
   document.getElementById("wrongList").innerHTML=wHTML||`<span style="color:var(--muted);font-size:.75rem">None yet 🎉</span>`;
 
   // weak topics
@@ -852,21 +908,30 @@ function prev(){
 function skip(){next();}
 
 function retryWrong(){
-  const wrongPos=[];
-  state.results.forEach((r,i)=>{if(r&&!r.correct) wrongPos.push(i);});
-  if(!wrongPos.length){showToast("No wrong answers yet!");return;}
-  wrongPos.forEach(i=>{state.results[state.questionOrder[i]]=null;});
-  state.filteredOrder=wrongPos;
-  state.index=wrongPos[0];
+  // Clear ALL answers within the current filter (right or wrong) and let the user redo
+  if(!state.filteredOrder.length){showToast("Nada para refazer!");return;}
+  const label=state.filter||"All Topics";
+  if(!confirm(`Limpar todas as respostas de "${label}" (${state.filteredOrder.length} perguntas)?`)) return;
+  // Null out results within the filter
+  state.filteredOrder.forEach(pos=>{state.results[state.questionOrder[pos]]=null;});
+  // Recompute topicErrors from scratch (since some may now be null)
+  state.topicErrors={};
+  for(let qIdx=0;qIdx<ALL.length;qIdx++){
+    const r=state.results[qIdx];
+    if(r&&!r.correct){
+      const t=ALL[qIdx][0];
+      state.topicErrors[t]=(state.topicErrors[t]||0)+1;
+    }
+  }
+  state.index=state.filteredOrder[0];
   state.streak=0;
-  document.querySelectorAll(".tbtn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("tFilter").textContent="Retrying wrong answers";
-  showToast(`Retrying ${wrongPos.length} wrong questions`);
+  saveState();
+  showToast(`Limpo — refazer ${state.filteredOrder.length} perguntas`);
   render();
 }
 
 function confirmReset(){
-  if(confirm("Reset all progress?")) restartQuiz();
+  if(confirm("Reset COMPLETO? Limpa todas as respostas e re-baralha as perguntas.")) restartQuiz();
 }
 
 /* KEYBOARD */
@@ -920,6 +985,8 @@ function loadState(){
     const s=JSON.parse(raw);
     if(s.questionOrder.length!==ALL.length) return false;
     Object.assign(state,s,{filter:null,filteredOrder:[...Array(ALL.length).keys()]});
+    // Force unshuffled option order — explanations reference (A)/(B)/(C)/(D) by source order
+    state.optionOrder = ALL.map(()=>[0,1,2,3]);
     return true;
   }catch(e){return false;}
 }

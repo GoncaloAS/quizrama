@@ -177,6 +177,21 @@ int main() {
 }
 ```
 
+### Fases da compilação
+
+A compilação de um programa C tem **4 fases sequenciais**:
+
+```
+.c  →  Pré-processador  →  .i  →  Compilador  →  .o  →  Linker  →  executável  →  Loader  →  RAM
+```
+
+1. **Pré-processador**: resolve `#include`, `#define`, comentários e directivas. Output: ficheiro `.i`.
+2. **Compilador**: traduz C → assembly → código-objecto (`.o`).
+3. **Linker**: junta vários `.o` + bibliotecas, resolve referências externas → executável.
+4. **Loader**: carrega o executável para RAM e dá-lhe controlo (em runtime, não compile-time).
+
+> Mnemónica: **P**ré → **C**ompilar → **L**inkar → **L**oad.
+
 ### Flags principais do compilador `gcc`
 
 | Flag | Significado |
@@ -185,6 +200,8 @@ int main() {
 | `-Wall`   | Mostra todos os *warnings* (avisos) |
 | `-g`      | Ativa informação de *debugging* (para usar com `gdb`) |
 | `-O`      | Ativa otimização (não recomendado em fase de desenvolvimento) |
+| `-c`      | Compila **apenas**, parando antes da linkagem (gera `.o`) |
+| `-l<nome>` | Linka com a biblioteca `lib<nome>` (ex.: `-lm` para `libm`) |
 
 **Exemplos:**
 ```bash
@@ -331,6 +348,8 @@ switch (val) {
         // executa se nenhum case anterior corresponder
 }
 ```
+
+> **Fall-through:** se omitires `break` no fim de um `case`, a execução **"cai"** para o caso seguinte (continua até encontrar `break` ou o fim do `switch`). NÃO há `break` implícito em C — fall-through é comportamento legal mas frequentemente é fonte de bugs.
 
 ### Ciclo `for`
 
@@ -1095,6 +1114,58 @@ I/O:  ── idle ── transferring ── idle ── transferring ── idl
 
 Enquanto o I/O transfere dados, o CPU continua a executar processos do utilizador. Quando o I/O termina, gera uma interrupção que o CPU trata.
 
+### Como o CPU identifica que interrupt ocorreu
+- Cada dispositivo tem um **número único** (interrupt request line).
+- O CPU usa esse número como **índice** para o **Interrupt Vector Table (IVT)**, que mapeia número → endereço da ISR (interrupt service routine).
+- A IVT está numa zona fixa de memória, definida pela arquitectura do CPU.
+
+### Interrupt Service Routine (ISR)
+- **ISR = código que trata o interrupt** (também chamado *interrupt handler*).
+- Cada tipo de interrupt tem a sua ISR registada na IVT.
+- Tem de ser **curta e rápida** — enquanto a ISR corre, outras tarefas estão suspensas.
+
+### Polling vs Interrupts
+| | **Polling** | **Interrupts** |
+|-|-------------|----------------|
+| **Como funciona** | CPU verifica periodicamente o estado do dispositivo | Dispositivo avisa o CPU quando precisa |
+| **Custo** | Desperdiça CPU verificando dispositivos inactivos | CPU só reage quando necessário |
+| **Latência** | Depende da frequência do polling | Imediata |
+| **Complexidade** | Simples | Mais complexa (handlers, IVT) |
+
+> **Polling** é apropriado para dispositivos muito frequentes (ex.: drivers de alta performance). **Interrupts** são a abordagem padrão para a maioria dos dispositivos.
+
+### Desactivar interrupts (Disable Interrupts)
+Por vezes o SO precisa de **desactivar interrupts** durante operações críticas:
+- Para garantir **execução atómica** de código sensível (ex.: actualização de estruturas de dados do kernel).
+- Para impedir que **ISRs interfiram** com operações em curso, evitando corrupção de estado.
+- Para proteger **secções críticas** muito curtas em uniprocessadores (ver §65).
+
+> **Cuidado:** desactivar interrupts deve ser **breve** — o sistema fica "surdo" a eventos enquanto está desactivado. Não é exposto a programas de utilizador.
+
+### Nested Interrupts
+- Um **nested interrupt** é um interrupt que ocorre **enquanto outro handler de interrupt está a correr**.
+- Por defeito, em sistemas modernos, ISRs são **interrompíveis** (a menos que estejam explicitamente a desactivar interrupts).
+- Permite que interrupts de **maior prioridade** (ex.: timer crítico) preemptem ISRs de menor prioridade.
+- Implica **stacking** dos contextos guardados — daí a necessidade de stack do kernel suficientemente grande.
+
+### Faults e Exceptions
+- **Fault (exception)** = interrupção de software disparada por **uma condição de erro detectada pelo CPU**:
+  - Divisão por zero.
+  - Acesso a página inválida (page fault).
+  - Instrução ilegal.
+  - Overflow aritmético.
+- Diferente de **trap** (system call): trap é **deliberada**; fault é **não-intencional**.
+- O SO pode tratar a fault (ex.: page fault → carregar página do disco) ou terminar o processo (ex.: divisão por zero → enviar SIGFPE).
+
+### Por que I/O passa pelo SO
+- Programas de utilizador **não acedem directamente** a dispositivos de I/O.
+- Razões:
+  - **Protecção**: impedir um programa de corromper hardware ou interferir com outros.
+  - **Abstracção**: programa não precisa de conhecer detalhes específicos do hardware (drivers).
+  - **Sincronização**: SO arbitra acesso quando vários processos querem o mesmo dispositivo.
+  - **Buffering/caching**: SO optimiza acessos.
+- Programas usam **system calls** (read, write, ioctl, …) que o SO traduz para operações de hardware.
+
 ---
 
 ## 26. Dispositivos de I/O e DMA
@@ -1346,6 +1417,61 @@ Um processo tem várias partes na memória:
 
 > As partes **text + data + heap + stack** formam o **address-space** do processo.
 
+### Address-space e isolamento
+- **Cada processo tem o seu próprio address-space virtual** isolado dos outros — protege contra interferência e corrupção mútua.
+- O segmento **text é read-only**, podendo ser **partilhado fisicamente** entre processos do mesmo programa (mais memória poupada).
+- Os segmentos **data, heap e stack são privados** a cada processo (cada um tem cópia própria).
+- Um acesso a memória inválida (fora do address-space ou a uma página não mapeada) → **segmentation fault** (SIGSEGV) e o processo é terminado.
+
+### Process Accounting e Limites de Recursos
+O SO regista no PCB **quanto recurso cada processo usa** (CPU time, memória, I/O...) — permite:
+- **Billing/auditoria** em sistemas multi-utilizador.
+- **Estatísticas** para o scheduler.
+- **Limites por processo** (`ulimit` em UNIX): CPU time, número de ficheiros abertos, tamanho de stack, etc.
+- Quando um processo **excede um limite**, o SO tipicamente **termina-o** (envia SIGXCPU, SIGXFSZ, etc.).
+
+### Foreground vs Background
+- **Foreground**: processo ligado ao terminal — recebe input e envia output directamente.
+- **Background**: processo desligado do terminal — corre sem bloquear o shell.
+- Em UNIX, o shell põe um processo em background com `&` no fim do comando: `./prog &`.
+- Internamente, o shell faz `fork()` para criar o filho e **não chama `wait()`**, voltando logo a aceitar comandos.
+
+### Daemons
+Um **daemon** é um processo de longa duração que corre em **background** sem interface de terminal (ex.: `sshd`, `cron`, `nginx`). Tipicamente:
+- Arrancam no boot (via `init`/`systemd`).
+- Não têm terminal de controlo.
+- Esperam por eventos (sockets, sinais, timers) e respondem.
+
+### Process Groups e Sessions
+- **Process group**: conjunto de processos relacionados, identificados por **PGID**. Tipicamente todos os processos lançados pelo mesmo comando do shell.
+- **Session**: conjunto de process groups, identificados por **SID** — tipicamente uma sessão de login.
+- Utilidade:
+  - **Sinais ao grupo**: `kill -SIGTERM -<PGID>` envia sinal a todos os processos do grupo (ex.: `Ctrl+C` envia SIGINT ao grupo de foreground).
+  - **Job control** no shell.
+
+### Pseudo-Terminals (PTYs)
+- Um **PTY** é um par de file descriptors que **emula um terminal** sem hardware real.
+- Necessários para:
+  - **Shells remotos** (`ssh`) — o servidor cria um PTY e liga-o ao shell.
+  - **Terminal multiplexers** (`tmux`, `screen`).
+  - **Emuladores de terminal** (xterm, iTerm) — comunicam com o shell via PTY.
+
+### Processor Binding (CPU Affinity)
+- **Restringir** um processo a correr apenas em **CPUs específicos** (em sistemas SMP).
+- Linux: `taskset`, `sched_setaffinity()`.
+- Vantagens: melhor uso de cache (não perde quando muda de CPU), latência previsível.
+- Útil em sistemas real-time e em workloads críticos.
+
+### Process Priority
+- Cada processo tem uma **prioridade** que influencia o scheduling.
+- Em UNIX, a prioridade é ajustada via **nice value** (-20 a +19). Mais baixo = mais prioridade.
+- O scheduler usa prioridade para decidir qual processo correr a seguir (ver §50).
+
+### Process Spawning e Lifetime
+- **Spawning** = criar um novo processo (em UNIX, via `fork()` + `exec()`).
+- **Process lifetime** vai de **NEW** (criação) até **TERMINATED** (saída).
+- Um processo terminado **não pode ser reiniciado** — para "reiniciar", o pai tem de criar um novo filho (`fork()`).
+
 ---
 
 ## 30. Process Control Block (PCB)
@@ -1491,6 +1617,29 @@ Dispatcher:       ▓▓▓     ▓▓▓     ▓▓▓     ▓▓▓
 - **Quanto mais complexo o SO e o PCB, mais demorado** é o context switch.
 - Algumas máquinas têm **vários conjuntos de registos** por CPU — o context switch torna-se apenas mudar o ponteiro para o novo conjunto.
 
+### Triggers de Context Switch
+Um context switch é **desencadeado por**:
+- **Timer interrupt** (preempção): o quantum do processo expirou.
+- **I/O syscall bloqueante**: processo pede I/O e bloqueia.
+- **Hardware interrupt**: outro processo (mais prioritário) é acordado.
+- **Voluntary yield**: processo desiste do CPU (`sched_yield()`).
+- **System call em geral**: pode ou não desencadear switch dependendo do scheduler.
+
+> Context switches **podem ocorrer durante execução do kernel** (kernel preemptivo) — são uma decisão do scheduler, não estão limitados a fronteiras de processo.
+
+### Custo: User vs Kernel Mode Switch
+- **Mode switch** (user ↔ kernel): apenas muda mode bit + alguns registos. Rápido (~ns).
+- **Context switch completo** (entre processos): guarda PCB inteiro, troca address-space (TLB flush!), recarrega PCB do novo. Mais lento (~µs).
+- **Demasiados context switches reduzem trabalho útil** — sintoma típico de quantum mau ou demasiados processos activos (thrashing).
+
+### Context Switch e Scheduling
+- O **scheduler decide** qual processo correr; o **dispatcher** faz o context switch propriamente dito.
+- Toda decisão de scheduling que mude o processo activo dispara um context switch.
+
+### Context Switch e System Calls
+- Uma system call por si só é um **mode switch** (user → kernel) — não necessariamente um context switch.
+- Mas se a syscall **bloquear** (ex.: `read()` num pipe vazio) ou **se o scheduler decidir preemptar**, ocorre context switch.
+
 ### Diagrama (slide 9)
 
 ```
@@ -1633,6 +1782,31 @@ parent ──► pid = fork()
                   └──► exec() ──► exit()
                   child (pid = 0)
 ```
+
+### Falhas de `fork()`
+`fork()` pode falhar e devolver **-1** quando o sistema esgota recursos:
+- **Excedeu número máximo de processos** no sistema (limite global do kernel).
+- **Excedeu número máximo de processos** do utilizador (`RLIMIT_NPROC`).
+- **Memória virtual insuficiente** para alocar PCB / page tables.
+
+Ou seja, `fork()` **não é infalível** — código robusto verifica o retorno antes de assumir sucesso.
+
+### Pipes antes de `fork()`
+Quando se quer criar uma **pipeline** (pai ↔ filho via pipe), o pipe deve ser **criado ANTES de `fork()`**:
+
+```c
+int fd[2];
+pipe(fd);              // cria pipe (fd[0] read, fd[1] write)
+pid_t pid = fork();    // fork DEPOIS — filho herda fd[0] e fd[1]
+```
+
+**Razão:** `fork()` duplica os file descriptors abertos do pai para o filho. Se o pipe fosse criado **depois** do fork, cada um teria o seu pipe separado e não conseguiriam comunicar.
+
+### Copy-on-Write (COW) e `fork()`
+Como `exec()` substitui imediatamente o address-space, copiar tudo no `fork()` seria desperdício. **Copy-on-write** optimiza:
+- Pai e filho **partilham fisicamente** as mesmas páginas em **modo read-only**.
+- Quando um deles **escreve** numa página, o SO duplica essa página específica.
+- Se o filho fizer logo `exec()`, **nenhuma página é realmente copiada** — `fork()+exec()` torna-se quase grátis.
 
 ---
 
@@ -1865,6 +2039,17 @@ O objetivo da **multiprogramação** é **ter sempre algum processo a executar**
 - A função fundamental do SO que está na base da multiprogramação é o **process scheduling**.
 - Ao escalonar o CPU eficientemente entre vários processos, o SO consegue **servir mais tarefas** e **tornar o computador mais produtivo**.
 
+### Hardware Timer Interrupts
+Schedulers preemptivos **dependem de hardware timer interrupts**:
+- O timer dispara periodicamente (ex.: cada 4 ms).
+- A ISR do timer dá controlo ao scheduler, que decide se preempta o processo actual.
+- Sem timer hardware, o SO não consegue forçar preempção — só algoritmos cooperativos seriam possíveis.
+
+### Real-Time Scheduling
+Em sistemas **real-time**, processos têm **deadlines** que não podem ser falhados. Algoritmos clássicos:
+- **Rate Monotonic (RM)**: prioridade **inversamente proporcional ao período** — tarefas com período mais curto têm prioridade mais alta. **Estática** (atribuída uma vez).
+- **Earliest Deadline First (EDF)**: prioridade **dinâmica**, atribuída ao processo cujo **deadline está mais próximo**. EDF é óptimo (escalona qualquer conjunto factível) mas mais complexo.
+
 ---
 
 ## 43. Ciclo CPU-I/O Burst
@@ -1889,6 +2074,13 @@ A execução de um processo pode ser vista como um **ciclo de CPU bursts e I/O b
 
 - A execução começa com um **CPU burst**, seguido por um **I/O burst**, seguido por outro CPU burst, etc.
 - Eventualmente, o **último CPU burst** termina com um pedido de **terminação**.
+
+### Classificação de Processos
+Conforme a relação CPU/I/O, classificamos os processos em:
+- **CPU-bound**: gastam a maior parte do tempo a fazer **computação** (CPU bursts longos, poucos I/O bursts). Ex.: cálculos científicos, compressão.
+- **I/O-bound**: gastam a maior parte do tempo a **esperar I/O** (CPU bursts curtos, muitos I/O bursts). Ex.: editores de texto, navegadores.
+
+> **Schedulers tipicamente favorecem processos I/O-bound** sobre CPU-bound — porque libertam o CPU rapidamente, permitindo melhor throughput global e melhor responsividade.
 
 ---
 
@@ -2181,6 +2373,19 @@ Processos de **baixa prioridade** podem **nunca executar** — ficam bloqueados 
 ### Solução: Aging
 
 > **Aging** = aumentar **gradualmente a prioridade** dos processos que estão à espera há muito tempo.
+
+### Priority Inversion
+**Priority inversion** ocorre quando um **processo de baixa prioridade bloqueia um processo de alta prioridade** indirectamente:
+1. Processo de **baixa** prioridade (L) detém um lock.
+2. Processo de **alta** prioridade (H) tenta adquirir o lock e bloqueia.
+3. Processo de **prioridade média** (M) ganha CPU e impede L de correr (e portanto de libertar o lock).
+4. Resultado: H espera M, mas devia preceder M — inversão!
+
+> Caso famoso: Mars Pathfinder (1997). Um processo de baixa prioridade bloqueou um processo de alta prioridade durante minutos.
+
+**Soluções:**
+- **Priority Inheritance**: o processo que detém o lock **herda temporariamente** a prioridade mais alta entre os bloqueados, garantindo que avança rapidamente.
+- **Priority Ceiling**: cada lock tem uma **prioridade tecto**; quem o adquire fica com essa prioridade enquanto o detém.
 
 ### Exemplo
 
@@ -3590,63 +3795,79 @@ Tirar recursos a processos e dá-los a outros até quebrar o deadlock. **Três q
 
 ### Parte I — Linguagem C — coisas para nunca esquecer
 
-1. **C usa call by value por defeito** — para alterar variáveis dentro de funções, passa apontadores.
-2. **`'\0'` no fim das strings** — sempre alocar 1 byte extra.
-3. **`malloc` no heap, variáveis locais na stack** — não devolver apontadores para variáveis locais.
-4. **Sempre fazer `free`** após `malloc`.
-5. **Verificar se `malloc` devolveu `NULL`**.
-6. **Operador `->` para campos via apontador**, `.` para campo direto.
-7. **Pré-processador faz substituição de texto** antes da compilação.
-8. **Linkagem estática = tudo no binário**; dinâmica = carregada em runtime.
-9. **`argc` inclui o nome do programa**, por isso `argc == 1` quando não há argumentos.
-10. **`if (cond)` em C: `0` ou `NULL` é falso, qualquer outra coisa é verdadeiro.**
+1. **4 fases de compilação:** Pré-processador → Compilador → Linker → Loader (P-C-L-L).
+2. **Flags gcc:** `-o` nome, `-Wall` warnings, `-g` debug, `-c` só compilar (sem link), `-l<lib>` linkar biblioteca.
+3. **C usa call by value por defeito** — para alterar variáveis dentro de funções, passa apontadores.
+4. **Byte zero (`\0`) no fim das strings** — sempre alocar 1 byte extra.
+5. **`malloc` no heap, variáveis locais na stack** — não devolver apontadores para variáveis locais.
+6. **Sempre fazer `free`** após `malloc`. **Verificar se `malloc` devolveu `NULL`**.
+7. **Operador `->` para campos via apontador**, `.` para campo direto.
+8. **Switch sem `break` → fall-through** (NÃO há break implícito).
+9. **Pré-processador faz substituição de texto** antes da compilação.
+10. **Linkagem estática = tudo no binário**; dinâmica = carregada em runtime. Linker é "inteligente" — só inclui `.o` realmente usados.
+11. **`argc` inclui o nome do programa**, por isso `argc == 1` quando não há argumentos.
+12. **`if (cond)` em C: `0` ou `NULL` é falso, qualquer outra coisa é verdadeiro.**
 
 ### Parte II — Conceitos de SO — coisas para nunca esquecer
 
 1. **SO = gestor do hardware** + facilitador para os programas.
 2. **4 componentes principais:** processos, memória, armazenamento, I/O.
-3. **Multiprogramming** maximiza **utilização do CPU**; **Multitasking** maximiza **tempo de resposta**.
-4. **Boot:** firmware (ROM) → carrega kernel → arranca system processes (ex.: `init`).
-5. **Interrupções:** podem vir do **hardware** (sinal ao CPU) ou do **software** (system call).
-6. **Interrupt vector** guarda os endereços das ISRs (interrupt service routines).
-7. **Device controller** = hardware; **device driver** = software (interface uniforme para o SO).
-8. **DMA** evita ter o CPU envolvido em cada byte → **uma só interrupção por bloco**.
-9. **Timer** protege o SO de programas que não devolvem o controlo.
-10. **Dual-mode (user/kernel)** com **mode bit**: instruções privilegiadas só correm em kernel mode.
-11. **System call = trap** que muda para kernel mode; o **return** volta a user mode.
-12. **APIs (POSIX, Win32, Java)** são preferíveis às system calls diretas (portabilidade + simplicidade).
-13. **6 categorias de system calls:** process control, file manipulation, device manipulation, information maintenance, communication, protection.
+3. **Foco do SO depende do tipo:** mainframe→utilização; PC→ease of use; mobile→bateria; embedded→autonomia.
+4. **Multiprogramming** maximiza **utilização do CPU**; **Multitasking** maximiza **tempo de resposta**.
+5. **Boot:** firmware (ROM) → carrega kernel → arranca system processes (ex.: `init`).
+6. **Interrupções:** podem vir do **hardware** (sinal ao CPU) ou do **software** (system call ou fault).
+7. **Interrupt vector** guarda os endereços das ISRs (interrupt service routines).
+8. **Polling vs interrupts:** polling desperdiça CPU; interrupts são event-driven.
+9. **Disable interrupts** = ferramenta para garantir atomicidade em código kernel curto.
+10. **Nested interrupts:** ISRs podem ser interrompidas por interrupts mais prioritários.
+11. **Faults (exceptions):** divisão por zero, page fault, instrução ilegal — interrupção de software disparada por erro.
+12. **Device controller** = hardware; **device driver** = software (interface uniforme para o SO).
+13. **DMA** evita ter o CPU envolvido em cada byte → **uma só interrupção por bloco**.
+14. **Timer** protege o SO de programas que não devolvem o controlo.
+15. **Dual-mode (user/kernel)** com **mode bit**: instruções privilegiadas só correm em kernel mode.
+16. **System call = trap** que muda para kernel mode; o **return** volta a user mode.
+17. **APIs (POSIX, Win32, Java)** são preferíveis às system calls diretas (portabilidade + simplicidade).
+18. **6 categorias de system calls:** process control, file manipulation, device manipulation, information maintenance, communication, protection.
 
 ### Parte III — Processos — coisas para nunca esquecer
 
 1. **Processo = programa em execução** (entidade ativa). Programa = entidade passiva.
-2. **Address-space** = text + data + heap + stack. **PCB** = state, PID, PC, registers, scheduling info, memory info, I/O info.
-3. **5 estados:** new, ready, running, waiting/blocked, terminated. **Só um running por CPU**.
-4. **Transições:** `TI` (running→ready), `I/O` (running→waiting), `HI` (waiting→ready), `dispatch` (ready→running).
-5. **Context switch é puro overhead** — guarda PCB do antigo, carrega PCB do novo.
-6. **`fork()`** retorna **0 no filho** e **PID do filho no pai**. Filho começa como cópia do pai.
-7. **`exec()`** substitui o address-space mas **mantém o PCB** (mesmo PID).
-8. **`wait()`** no pai recolhe o exit status do filho e o seu PID.
-9. **Zombie** = filho terminou e o pai não fez `wait()`. **Orphan** = pai morreu antes do filho → adotado pelo `init`.
-10. **Cascading termination**: alguns SO matam os filhos quando o pai sai.
-11. **2 modelos de IPC:** **message passing** (kernel intervém, funciona em rede) e **shared memory** (mais rápido, problemas de sincronização).
-12. **`pipe(fd[2])`**: `fd[0]` read-end, `fd[1]` write-end. **Unidirecional**. Filho **herda** os file descriptors após `fork()`.
+2. **Address-space** = text + data + heap + stack. **TEXT é read-only e partilhável**; data/heap/stack privados.
+3. **PCB** = state, PID, PC, registers, scheduling info, memory info, I/O info, accounting.
+4. **5 estados:** new, ready, running, waiting/blocked, terminated. **Só um running por CPU**.
+5. **Transições:** `TI` (running→ready), `I/O` (running→waiting), `HI` (waiting→ready), `dispatch` (ready→running). NÃO há waiting→running directo.
+6. **Context switch é puro overhead** — guarda PCB do antigo, carrega PCB do novo. Triggers: timer, syscall bloqueante, interrupt, voluntary yield.
+7. **Mode switch (user↔kernel) ≠ context switch**: mode switch é mais leve (só mode bit + alguns regs).
+8. **`fork()`** retorna **0 no filho** e **PID do filho no pai**. Filho começa como cópia do pai. **Pode falhar** (-1) se sistema esgotar recursos.
+9. **Pipes antes de `fork()`** — para o filho herdar os file descriptors do pipe.
+10. **Copy-on-write (COW)**: pai e filho partilham páginas read-only; só são copiadas no primeiro write. Torna `fork()+exec()` quase grátis.
+11. **`exec()`** substitui o address-space mas **mantém o PCB** (mesmo PID).
+12. **`wait()`** no pai recolhe o exit status do filho e o seu PID.
+13. **Zombie** = filho terminou e o pai não fez `wait()`. **Orphan** = pai morreu antes do filho → adotado pelo `init`.
+14. **Cascading termination**: alguns SO matam os filhos quando o pai sai.
+15. **Process groups e sessions:** para aplicar sinais/I/O ao grupo (ex.: `Ctrl+C` envia SIGINT ao grupo de foreground).
+16. **Daemon** = processo de longa duração em background, sem terminal.
+17. **2 modelos de IPC:** **message passing** (kernel intervém, funciona em rede) e **shared memory** (mais rápido, problemas de sincronização).
+18. **`pipe(fd[2])`**: `fd[0]` read-end, `fd[1]` write-end. **Unidirecional**. Filho **herda** os file descriptors após `fork()`.
 
 ### Parte IV — Escalonamento — coisas para nunca esquecer
 
-1. **Execução = ciclos CPU burst + I/O burst**. O scheduling preocupa-se com o **próximo CPU burst**.
-2. **Não-preemptivo** = só decide nas situações 1 e 4 (running→waiting e termina). **Preemptivo** = decide nas 4 situações.
-3. **Critérios:** maximizar CPU utilization e throughput; **minimizar** turnaround, waiting e response time.
-4. **FCFS:** simples, FIFO, não-preemptivo. **Convoy effect** (curtos atrás de longos).
-5. **RR:** FCFS preemptivo com quantum Q. Q grande ≈ FCFS; Q pequeno → muito context switching.
-6. **SJF é ÓTIMO** em average waiting time. **SRTF** = SJF preemptivo. Sofre de **starvation**.
-7. **Previsão do próximo burst:** `τ(n+1) = α·t(n) + (1−α)·τ(n)`, com `α = 1/2` típico.
-8. **Priority scheduling:** maior prioridade ganha. Risco de **starvation** → mitigar com **aging**.
-9. **MLQ:** filas separadas, processos **fixos** numa fila. Cada fila com seu algoritmo. Sched entre filas: fixed priority ou time slice.
-10. **MLFQ:** processos **mudam de fila**; CPU-bound caem, I/O-bound sobem; aging previne starvation. Aproxima SRTF na prática.
-11. **CFS (Linux):** classes (Real-Time 0–99, Normal 100–139). Normal escalonado pelo **menor virtual runtime** (afetado por **nice ∈ [-20, +19]**).
-12. **CFS sem time slice fixo:** task corre **até deixar de ser a mais injustamente tratada** (vruntime ≥ outra). **Target latency** garante que cada task corre pelo menos uma vez.
-13. **Cálculos de waiting time:** `WT = tempo na ready queue` (não conta tempo a executar nem em I/O). Para cada processo: `WT = completion - arrival - burst_total`.
+1. **Execução = ciclos CPU burst + I/O burst**. **CPU-bound** (bursts longos) vs **I/O-bound** (bursts curtos). Schedulers tipicamente favorecem I/O-bound.
+2. **Hardware timer interrupts** são essenciais para scheduling preemptivo.
+3. **Não-preemptivo** = só decide nas situações 1 e 4 (running→waiting e termina). **Preemptivo** = decide nas 4 situações.
+4. **Critérios:** maximizar CPU utilization e throughput; **minimizar** turnaround, waiting e response time.
+5. **FCFS:** simples, FIFO, não-preemptivo. **Convoy effect** (curtos atrás de longos).
+6. **RR:** FCFS preemptivo com quantum Q. Q grande ≈ FCFS; Q pequeno → muito context switching.
+7. **SJF é ÓTIMO** em average waiting time. **SRTF** = SJF preemptivo. Sofre de **starvation**.
+8. **Previsão do próximo burst:** `τ(n+1) = α·t(n) + (1−α)·τ(n)`, com `α = 1/2` típico.
+9. **Priority scheduling:** maior prioridade ganha. Risco de **starvation** → mitigar com **aging**.
+10. **Priority inversion:** baixa prioridade detém lock → alta prioridade fica bloqueada → média prioridade preempta a baixa. Solução: **priority inheritance** ou **priority ceiling**.
+11. **MLQ:** filas separadas, processos **fixos** numa fila. Cada fila com seu algoritmo. Sched entre filas: fixed priority ou time slice.
+12. **MLFQ:** processos **mudam de fila**; CPU-bound caem, I/O-bound sobem; aging previne starvation. Aproxima SRTF na prática.
+13. **CFS (Linux):** classes (Real-Time 0–99, Normal 100–139). Normal escalonado pelo **menor virtual runtime** (afetado por **nice ∈ [-20, +19]**).
+14. **CFS sem time slice fixo:** task corre **até deixar de ser a mais injustamente tratada** (vruntime ≥ outra). **Target latency** garante que cada task corre pelo menos uma vez.
+15. **Real-time scheduling:** **Rate Monotonic** (prioridade fixa, inversa ao período) e **Earliest Deadline First** (prioridade dinâmica, deadline mais próximo).
+16. **Cálculos de waiting time:** `WT = tempo na ready queue` (não conta tempo a executar nem em I/O). Para cada processo: `WT = completion - arrival - burst_total`.
 
 ### Parte V — Sincronização de Processos — coisas para nunca esquecer
 
