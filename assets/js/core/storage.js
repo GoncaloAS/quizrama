@@ -1,10 +1,12 @@
 /**
  * Persistência do progresso em localStorage.
  *
- * Chave: "osQuizState".
+ * Chave: "osQuizState" por omissão. Uma página pode definir
+ * `window.QUIZ_STORAGE_KEY` (antes deste script) para isolar o progresso —
+ * é assim que o Teste 2 (teste2.html) guarda a sessão em separado.
  * Robustez: try/catch silencioso — falha no localStorage não bloqueia a app.
  */
-const STORAGE_KEY = "osQuizState";
+const STORAGE_KEY = (typeof window !== "undefined" && window.QUIZ_STORAGE_KEY) || "osQuizState";
 
 function saveState(){
   try{

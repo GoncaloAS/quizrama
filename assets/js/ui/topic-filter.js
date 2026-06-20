@@ -5,7 +5,7 @@
  * "🎯 Treino" e "📝 Exames" são inseridos antes da primeira ocorrência
  * de cada grupo.
  */
-const TOPIC_ORDER=['Linguagem C','Conceitos Básicos','I/O e Interrupções','System Calls','Processos','IPC','Escalonamento','Sincronização','Deadlocks','Treino · fork()','Treino · Pipes','Treino · Scheduling','Treino · Sinais','Exame · Parte I','Exame · Parte II','Exame · Parte III','Exame · Parte IV','Exame · Parte V','Exame · Parte VI'];
+const TOPIC_ORDER=['Linguagem C','Conceitos Básicos','I/O e Interrupções','System Calls','Processos','IPC','Escalonamento','Sincronização','Deadlocks','Threads','Sistema de Ficheiros','Dispositivos de Armazenamento','Gestão de Memória','Memória Virtual','Treino · fork()','Treino · Pipes','Treino · Scheduling','Treino · Sinais','Exame · Parte I','Exame · Parte II','Exame · Parte III','Exame · Parte IV','Exame · Parte V','Exame · Parte VI'];
 
 function buildTopicFilter(){
   const topics={};

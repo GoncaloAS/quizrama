@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>OS Quiz — Questions</title>
+<title>OS Quiz — Teste 2</title>
+<!-- Isola o progresso do Teste 2 do Teste 1 (chave de localStorage própria). -->
+<script>window.QUIZ_STORAGE_KEY = "osQuizT2State";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -30,16 +32,16 @@
 <!-- TOPBAR -->
 <header class="topbar">
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
-  <div class="topbar-title">OS QUIZ · TESTE 1</div>
-  <a class="guide-btn" href="sistemas_operacoes_estudo__2_.html" target="_blank" title="Abrir o guia de estudo">
+  <div class="topbar-title">OS QUIZ · TESTE 2</div>
+  <a class="guide-btn" href="index.html" title="Voltar ao quiz do Teste 1">
+    <span class="gicon">↩</span>
+    <span class="gtext-full">Teste 1</span>
+    <span class="gtext-short">T1</span>
+  </a>
+  <a class="guide-btn" href="guia_estudo_teste2.html" target="_blank" title="Abrir o guia de estudo do Teste 2">
     <span class="gicon">📖</span>
     <span class="gtext-full">Ver Matéria</span>
     <span class="gtext-short">Matéria</span>
-  </a>
-  <a class="guide-btn" href="teste2.html" title="Ir para o quiz do Teste 2">
-    <span class="gicon">🆕</span>
-    <span class="gtext-full">Teste 2</span>
-    <span class="gtext-short">T2</span>
   </a>
   <div class="topbar-progress">
     <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
@@ -75,7 +77,7 @@
 <aside class="sidebar" id="sidebar">
 
   <div class="sidebar-close">
-    <span class="sidebar-close-title">📚 OS QUIZ — MENU</span>
+    <span class="sidebar-close-title">📚 OS QUIZ · TESTE 2</span>
     <button class="sidebar-close-btn" onclick="toggleSidebar()" aria-label="Close menu">✕</button>
   </div>
 
@@ -163,27 +165,13 @@
 </main>
 </div>
 
-<!-- Banco de perguntas — um ficheiro por tópico, depois orquestrador (define o global ALL) -->
-<script src="assets/js/data/questions/linguagem-c.js"></script>
-<script src="assets/js/data/questions/conceitos-basicos.js"></script>
-<script src="assets/js/data/questions/i-o-e-interrupcoes.js"></script>
-<script src="assets/js/data/questions/system-calls.js"></script>
-<script src="assets/js/data/questions/processos.js"></script>
-<script src="assets/js/data/questions/ipc.js"></script>
-<script src="assets/js/data/questions/escalonamento.js"></script>
-<script src="assets/js/data/questions/sincronizacao.js"></script>
-<script src="assets/js/data/questions/deadlocks.js"></script>
-<script src="assets/js/data/questions/exame-parte-i.js"></script>
-<script src="assets/js/data/questions/exame-parte-ii.js"></script>
-<script src="assets/js/data/questions/exame-parte-iii.js"></script>
-<script src="assets/js/data/questions/exame-parte-iv.js"></script>
-<script src="assets/js/data/questions/exame-parte-v.js"></script>
-<script src="assets/js/data/questions/exame-parte-vi.js"></script>
-<script src="assets/js/data/questions/treino-fork.js"></script>
-<script src="assets/js/data/questions/treino-pipes.js"></script>
-<script src="assets/js/data/questions/treino-scheduling.js"></script>
-<script src="assets/js/data/questions/treino-sinais.js"></script>
-<script src="output.js"></script>
+<!-- Banco de perguntas do Teste 2 — um ficheiro por tópico, depois orquestrador (define o global ALL) -->
+<script src="assets/js/data/questions2/threads.js"></script>
+<script src="assets/js/data/questions2/sistema-ficheiros.js"></script>
+<script src="assets/js/data/questions2/dispositivos-armazenamento.js"></script>
+<script src="assets/js/data/questions2/gestao-memoria.js"></script>
+<script src="assets/js/data/questions2/memoria-virtual.js"></script>
+<script src="output2.js"></script>
 
 <!-- Dados / mapas estáticos -->
 <script src="assets/js/data/topic-colors.js"></script>

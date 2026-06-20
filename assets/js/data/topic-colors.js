@@ -32,6 +32,12 @@ const TOPIC_COLORS = {
   "Exame · Parte IV":   {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
   "Exame · Parte V":    {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
   "Exame · Parte VI":   {color:"#fbbf24",bg:"rgba(251,191,36,.18)"},
+  // ── Teste 2 (slides #06–#10) ──
+  "Threads":                       {color:"#60a5fa",bg:"rgba(96,165,250,.12)"},
+  "Sistema de Ficheiros":          {color:"#fbbf24",bg:"rgba(251,191,36,.12)"},
+  "Dispositivos de Armazenamento": {color:"#f472b6",bg:"rgba(244,114,182,.12)"},
+  "Gestão de Memória":             {color:"#34d399",bg:"rgba(52,211,153,.12)"},
+  "Memória Virtual":               {color:"#a78bfa",bg:"rgba(167,139,250,.12)"},
 };
 const tc = t => (TOPIC_COLORS[t]||TOPIC_COLORS["General OS"]).color;
 const tb = t => (TOPIC_COLORS[t]||TOPIC_COLORS["General OS"]).bg;

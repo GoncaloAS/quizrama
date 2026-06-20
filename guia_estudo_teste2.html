@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sistemas de Operações — Guia de Estudo (Teste 2)</title>
+<style>
+/* ─────────────────────────────────────────────
+   Sistemas de Operações — Guia de Estudo (Teste 2)
+   Threads · Sistema de Ficheiros · Armazenamento ·
+   Gestão de Memória · Memória Virtual
+   Mesmo design visual do guia do Teste 1.
+   ───────────────────────────────────────────── */
+:root{
+  --bg:#ffffff; --surface:#f6f8fa; --text:#1f2328; --muted:#59636e;
+  --border:#d0d7de; --primary:#1F3864; --primary2:#2E75B6; --accent:#5b8af0;
+  --quote-bg:#f0f7ff; --quote-bd:#2E75B6;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:24px;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16px;line-height:1.65;color:var(--text);background:var(--bg);
+  max-width:920px;margin:0 auto;padding:30px 28px 80px;
+}
+h1{color:var(--primary);font-size:2.1em;font-weight:800;margin:1.2em 0 .5em;padding-bottom:.3em;border-bottom:3px solid var(--primary2);letter-spacing:-.01em;}
+h2{color:var(--primary);font-size:1.55em;font-weight:700;margin:2em 0 .6em;padding-bottom:.25em;border-bottom:2px solid #e1e7ee;letter-spacing:-.01em;}
+h3{color:var(--primary2);font-size:1.2em;font-weight:700;margin:1.4em 0 .5em;}
+h4{color:#4a5b78;font-size:1.05em;font-weight:700;margin:1.2em 0 .4em;}
+:target{animation:anchorPulse 1.4s ease-out;scroll-margin-top:24px;}
+@keyframes anchorPulse{0%{background:rgba(46,117,182,.18);}100%{background:transparent;}}
+p{margin:.65em 0;} ul,ol{margin:.55em 0 .85em;padding-left:1.7em;} li{margin:.25em 0;}
+li>p{margin:.3em 0;} strong{color:#0d1f3c;font-weight:700;} em{color:#4a5b78;}
+hr{border:0;border-top:1px dashed #c4cbd4;margin:2.2em 0;}
+code{font-family:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;font-size:.88em;background:#eef2f7;color:#b2294f;padding:.12em .45em;border-radius:4px;border:1px solid #e1e7ee;}
+pre{background:#0e1625;color:#e8edff;font-family:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;font-size:.85em;line-height:1.55;padding:14px 18px;border-radius:8px;overflow-x:auto;margin:1em 0;box-shadow:var(--shadow);}
+pre code{background:transparent;color:inherit;border:0;padding:0;font-size:inherit;}
+blockquote{border-left:4px solid var(--quote-bd);background:var(--quote-bg);margin:1em 0;padding:.6em 1.1em;border-radius:0 8px 8px 0;color:#1c3b5c;}
+blockquote p{margin:.4em 0;} blockquote strong{color:#0d2a4a;}
+table{border-collapse:collapse;margin:1em 0;width:100%;background:#fff;box-shadow:var(--shadow);border-radius:8px;overflow:hidden;}
+thead{background:linear-gradient(135deg,var(--primary) 0%,var(--primary2) 100%);}
+th{color:#fff;font-weight:700;text-align:left;padding:10px 14px;font-size:.9em;letter-spacing:.02em;}
+td{padding:9px 14px;border-top:1px solid #e1e7ee;vertical-align:top;font-size:.93em;}
+tbody tr:nth-child(even){background:#fafbfc;} tbody tr:hover{background:#f0f7ff;} td code{font-size:.85em;}
+a{color:var(--primary2);text-decoration:none;border-bottom:1px solid rgba(46,117,182,.25);transition:all .15s ease;}
+a:hover{color:var(--accent);border-bottom-color:var(--accent);}
+h1 a,h2 a,h3 a,h4 a{color:inherit;border:0;}
+sub{font-size:.78em;color:var(--muted);}
+/* Callouts */
+.callout{border-radius:0 8px 8px 0;padding:.7em 1.1em;margin:1.1em 0;border-left:4px solid var(--primary2);background:var(--quote-bg);}
+.callout.tip{border-left-color:#22c55e;background:rgba(34,197,94,.08);}
+.callout.warn{border-left-color:#f59e0b;background:rgba(245,158,11,.10);}
+.callout.key{border-left-color:#8b5cf6;background:rgba(139,92,246,.09);}
+.callout b{color:#0d2a4a;}
+/* Banner + part headers */
+.banner{padding:30px 24px;background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);border-radius:12px;color:#fff;text-align:center;margin:6px 0 8px;}
+.banner h1{color:#fff;border:0;margin:.2em 0;}
+.banner sub{color:#BDD7EE;letter-spacing:3px;}
+.banner .subtitle{color:rgba(255,255,255,.92);font-size:.95em;}
+.parthead{display:block;border-radius:8px;padding:18px 22px;margin:30px 0 10px;border-left:6px solid #5b8af0;background:linear-gradient(135deg,rgba(91,138,240,.13),rgba(91,138,240,.05));}
+.parthead sub{display:block;letter-spacing:2px;margin-bottom:4px;}
+.parthead h2{border:0;margin:0;padding:0;color:var(--primary);font-size:1.5em;}
+.p-threads{border-left-color:#60a5fa;background:linear-gradient(135deg,rgba(96,165,250,.14),rgba(96,165,250,.05));}
+.p-fs{border-left-color:#fbbf24;background:linear-gradient(135deg,rgba(251,191,36,.16),rgba(251,191,36,.05));}
+.p-storage{border-left-color:#f472b6;background:linear-gradient(135deg,rgba(244,114,182,.14),rgba(244,114,182,.05));}
+.p-mem{border-left-color:#34d399;background:linear-gradient(135deg,rgba(52,211,153,.14),rgba(52,211,153,.05));}
+.p-vm{border-left-color:#a78bfa;background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(167,139,250,.05));}
+.p-open{border-left-color:#ef4444;background:linear-gradient(135deg,rgba(239,68,68,.13),rgba(239,68,68,.05));}
+/* TOC */
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin:14px 0;}
+.toc ul{margin:.3em 0;columns:2;-webkit-columns:2;} .toc li{margin:.2em 0;break-inside:avoid;}
+.toc .grp{font-weight:700;color:var(--primary);margin-top:.5em;}
+.topnav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 6px;}
+.topnav a{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.85em;font-weight:600;border-bottom:1px solid var(--border);}
+.topnav a.quiz{background:linear-gradient(135deg,#1F3864,#2E75B6);color:#fff;border:0;}
+.back-to-top{position:fixed;bottom:22px;right:22px;background:var(--primary2);color:#fff;padding:10px 14px;border-radius:50%;font-size:1.1em;text-decoration:none;border:0;box-shadow:0 4px 12px rgba(31,56,100,.25);z-index:100;display:none;}
+.back-to-top:hover{background:var(--primary);color:#fff;}
+@media print{body{max-width:100%;padding:0;}pre,table{box-shadow:none;}a{color:inherit;}.toc ul{columns:1;}}
+@media (max-width:640px){body{padding:16px;font-size:15px;}h1{font-size:1.7em;}h2{font-size:1.3em;}h3{font-size:1.08em;}pre{font-size:.78em;padding:10px 12px;}table{font-size:.85em;}th,td{padding:6px 8px;}.toc ul{columns:1;}}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a class="quiz" href="teste2.html">🧠 Ir para o Quiz do Teste 2</a>
+  <a href="index.html">← Quiz do Teste 1</a>
+  <a href="sistemas_operacoes_estudo__2_.html">📖 Guia do Teste 1</a>
+</div>
+
+<div class="banner">
+  <p><sub>SISTEMAS DE OPERAÇÕES • FCUP • 2025 / 2026</sub></p>
+  <h1 id="topo">📗 Guia de Estudo — Teste 2</h1>
+  <p class="subtitle"><i>Threads • Sistema de Ficheiros • Dispositivos de Armazenamento • Gestão de Memória • Memória Virtual</i></p>
+</div>
+
+<p>Baseado nos conjuntos de slides <b>#06 a #10</b> da cadeira (livro <i>Operating System Concepts</i>, 10.ª ed., Silberschatz, Galvin &amp; Gagne). Cada secção corresponde a um capítulo do livro:</p>
+<ul>
+  <li><b>#06 Threads</b> — Capítulo 4</li>
+  <li><b>#07 Sistema de Ficheiros</b> — Capítulos 13 e 14</li>
+  <li><b>#08 Dispositivos de Armazenamento</b> — Capítulo 11</li>
+  <li><b>#09 Gestão de Memória</b> — Capítulo 9</li>
+  <li><b>#10 Memória Virtual</b> — Capítulo 10</li>
+</ul>
+
+<div class="callout warn"><b>Estrutura do exame (das diretivas):</b> 20 perguntas no total — <b>15 de escolha múltipla com 3 alternativas</b> (1 valor cada; <b>penalização de 1/3</b> por resposta errada) + <b>5 perguntas abertas</b> (4 com 2 alíneas + 1 com 1 alínea; 1 valor cada, <b>sem penalização</b>). A parte prática (código) <b>não</b> sai. Há uma <a href="#perguntas-abertas">secção de perguntas abertas resolvidas</a> no fim deste guia.</div>
+
+<h2 id="indice">Índice</h2>
+<div class="toc">
+<ul>
+  <li class="grp">🧵 Threads</li>
+  <li><a href="#t1-conceito-thread">1. Conceito de thread</a></li>
+  <li><a href="#t2-beneficios">2. Benefícios &amp; desempenho</a></li>
+  <li><a href="#t3-contexto">3. Contexto de execução · TCB vs PCB</a></li>
+  <li><a href="#t4-estados">4. Estados de uma thread</a></li>
+  <li><a href="#t5-context-switch">5. Context switch de threads</a></li>
+  <li><a href="#t6-bibliotecas">6. Bibliotecas de threads</a></li>
+  <li><a href="#t7-modelos">7. Modelos de multithreading</a></li>
+  <li><a href="#t8-pthreads">8. Pthreads (create/exit/join)</a></li>
+  <li><a href="#t9-exec-fork">9. Semântica de exec() e fork()</a></li>
+  <li class="grp">📁 Sistema de Ficheiros</li>
+  <li><a href="#f1-ficheiro">10. Ficheiro, atributos e tipos</a></li>
+  <li><a href="#f2-acesso">11. Acesso e proteção</a></li>
+  <li><a href="#f4-organizacao">12. Organização: volumes</a></li>
+  <li><a href="#f5-diretorios">13. Diretórios e links</a></li>
+  <li><a href="#f6-abertos">14. Ficheiros abertos · FCB</a></li>
+  <li><a href="#f7-mount-vfs">15. Montagem e VFS</a></li>
+  <li><a href="#f8-alocacao">16. Alocação de espaço em disco</a></li>
+  <li class="grp">💽 Dispositivos de Armazenamento</li>
+  <li><a href="#d1-hdd">17. HDD e SSD</a></li>
+  <li><a href="#d3-transferencias">18. Transferências e latências</a></li>
+  <li><a href="#d5-desempenho">19. Desempenho (cálculos)</a></li>
+  <li><a href="#d6-escalonamento">20. Escalonamento de disco</a></li>
+  <li class="grp">🧮 Gestão de Memória</li>
+  <li><a href="#m2-protecao">21. Proteção · base/limit</a></li>
+  <li><a href="#m3-logico-fisico">22. Endereços lógicos vs físicos</a></li>
+  <li><a href="#m4-mmu">23. MMU e relocação</a></li>
+  <li><a href="#m5-swapping">24. Swapping</a></li>
+  <li><a href="#m6-contigua">25. Alocação contígua · fits</a></li>
+  <li><a href="#m7-fragmentacao">26. Fragmentação</a></li>
+  <li><a href="#m8-segmentacao">27. Segmentação</a></li>
+  <li><a href="#m9-paginacao">28. Paginação</a></li>
+  <li><a href="#m10-tlb-eat">29. TLB e EAT</a></li>
+  <li><a href="#m11-page-tables">30. Estruturas de page table</a></li>
+  <li class="grp">🪄 Memória Virtual</li>
+  <li><a href="#v1-conceito">31. Conceito e demand paging</a></li>
+  <li><a href="#v3-page-fault">32. Page fault e bit válido</a></li>
+  <li><a href="#v4-eat">33. EAT do demand paging</a></li>
+  <li><a href="#v5-replacement">34. Substituição de páginas</a></li>
+  <li><a href="#v6-algoritmos">35. FIFO · OPT · LRU</a></li>
+  <li><a href="#v7-aproximacoes">36. Aproximações a LRU</a></li>
+  <li><a href="#v8-frames">37. Alocação de frames</a></li>
+  <li><a href="#v9-thrashing">38. Thrashing · working set · PFF</a></li>
+  <li class="grp">✍️ Extra</li>
+  <li><a href="#perguntas-abertas">39. Perguntas abertas resolvidas</a></li>
+</ul>
+</div>
+
+<!-- ════════════════════════════ THREADS ════════════════════════════ -->
+<div class="parthead p-threads"><sub>CONJUNTO #06 · CAPÍTULO 4</sub><h2>🧵 Threads</h2></div>
+
+<h2 id="t1-conceito-thread">1. Conceito de thread</h2>
+<p>Tradicionalmente um processo é <em>um programa em execução com uma única thread (single thread of execution)</em> — só pode fazer <b>uma tarefa de cada vez</b>. Os SO modernos estenderam o processo para suportar <b>múltiplas threads de execução</b> dentro do mesmo processo, permitindo realizar mais do que uma tarefa em simultâneo.</p>
+<ul>
+  <li><b>Single-threaded:</b> uma só thread por processo; <em>o conceito de thread nem sequer é reconhecido</em>.</li>
+  <li><b>Multithreading:</b> capacidade do SO de suportar <b>múltiplos caminhos concorrentes de execução dentro de um único processo</b>.</li>
+</ul>
+<p><b>Motivação:</b> a maioria das aplicações é um conjunto de várias tarefas. Tarefas independentes ou eventos assíncronos podem ser <em>intercalados</em> atribuindo uma thread a cada tarefa/tipo de evento.</p>
+<div class="callout key"><b>Partilhado vs privado (o ponto mais cobrado):</b> entre threads do mesmo processo são <b>partilhados</b> o <b>código (text), dados, heap, ficheiros abertos e sinais</b>. São <b>privados de cada thread</b> o <b>TID, o conjunto de registos (incluindo o program counter), a stack, a prioridade/política de escalonamento e os dados específicos da thread</b>.</div>
+
+<h2 id="t2-beneficios">2. Benefícios &amp; implicações de desempenho</h2>
+<p>Os <b>4 benefícios principais</b> do multithreading:</p>
+<ol>
+  <li><b>Performance (desempenho):</b> criar e gerir threads é mais barato do que processos; o <em>thread switch</em> tem menos overhead do que o <em>context switch</em> entre processos.</li>
+  <li><b>Resource Sharing (partilha de recursos):</b> as threads partilham por omissão a memória (mesmo espaço de endereçamento) e os recursos do processo; entre processos seriam precisos mecanismos complexos do SO.</li>
+  <li><b>Responsiveness (capacidade de resposta):</b> numa aplicação interativa, o programa continua a correr mesmo que parte esteja bloqueada ou a fazer uma operação demorada — crucial para interfaces de utilizador.</li>
+  <li><b>Parallelism (paralelismo):</b> um processo single-threaded corre num só processador; com threads, estas podem correr <em>verdadeiramente em paralelo</em> em vários cores.</li>
+</ol>
+<div class="callout"><b>Concorrência ≠ paralelismo:</b> concorrência é intercalar tarefas (possível mesmo num único core); paralelismo é correr ao mesmo tempo de verdade e <b>exige múltiplos processadores/cores</b>.</div>
+<p>É mais eficiente implementar unidades de execução relacionadas como threads do que como processos separados: é mais rápido <b>criar</b>, <b>terminar</b> e <b>trocar (switch)</b> entre threads, e a <b>comunicação entre threads é mais eficiente</b> (a comunicação entre processos normalmente exige a intervenção do kernel).</p>
+
+<h2 id="t3-contexto">3. Contexto de execução · TCB vs PCB</h2>
+<p>Uma thread é a informação necessária para representar um <b>contexto de execução dentro de um processo</b>: TID, prioridade/política de escalonamento, conjunto de registos (incl. PC), stack e dados específicos da thread.</p>
+<p>A informação de execução fica guardada <b>fora do PCB</b>, num <b>Thread Control Block (TCB)</b> por cada thread:</p>
+<table>
+<thead><tr><th>TCB (por thread)</th><th>PCB (por processo)</th></tr></thead>
+<tbody>
+<tr><td>Thread ID, estado (Ready…)</td><td>PID, User ID, Group ID</td></tr>
+<tr><td>Program Counter (PC)</td><td>Address space</td></tr>
+<tr><td>Registos</td><td>Open files, network sockets</td></tr>
+<tr><td>Ponteiro para o PCB</td><td>Ponteiro para a lista de TCBs</td></tr>
+</tbody>
+</table>
+<p>Ou seja: cada TCB aponta para o seu PCB, e cada PCB aponta para a lista dos seus TCBs.</p>
+
+<h2 id="t4-estados">4. Estados de uma thread</h2>
+<p>Como nos processos, há <b>3 estados</b>: <b>Running</b> (a executar), <b>Ready</b> (à espera de processador) e <b>Waiting/Blocked</b> (à espera de um evento). Há <b>4 operações</b> que mudam o estado:</p>
+<ul>
+  <li><b>Spawn</b> — cria-se uma nova thread (recebe contexto de registos e stack; vai para a <em>ready queue</em>).</li>
+  <li><b>Block</b> — a thread espera por um evento (guarda registos e stack pointers).</li>
+  <li><b>Unblock</b> — ocorre o evento esperado; a thread volta à <em>ready queue</em>.</li>
+  <li><b>Finish</b> — a thread termina (registos e stack são desalocados).</li>
+</ul>
+<div class="callout warn"><b>Armadilha:</b> são <b>3 estados</b> mas <b>4 operações</b> — não confundir as contagens.</div>
+
+<h2 id="t5-context-switch">5. Context switch de threads</h2>
+<p>Com threads, as scheduling queues passam a apontar para <b>TCBs</b>; trocar de thread implica guardar o contexto da atual no seu TCB e carregar o da próxima a partir do TCB dela.</p>
+<ul>
+  <li>Entre <b>duas threads do mesmo processo</b>: <b>não</b> é preciso mudar o espaço de endereçamento → mais barato.</li>
+  <li>Entre <b>threads de processos diferentes</b>: tem de <b>mudar o address space</b>, podendo <b>invalidar a cache ou gerar page faults</b> → mais caro.</li>
+</ul>
+
+<h2 id="t6-bibliotecas">6. Bibliotecas de threads</h2>
+<p>Uma <b>thread library</b> dá a API para criar/gerir threads. Dois tipos:</p>
+<ul>
+  <li><b>User-level (user threads):</b> geridas em <em>user space</em>, sem suporte do kernel; chamar a biblioteca é uma <b>chamada de função local</b> (não uma system call).</li>
+  <li><b>Kernel-level (kernel threads):</b> suportadas e geridas pelo SO; chamar a biblioteca resulta numa <b>system call</b>.</li>
+</ul>
+<p>Todos os SO atuais (Windows, Linux, macOS, Solaris) suportam kernel threads. As três bibliotecas principais:</p>
+<table>
+<thead><tr><th>Biblioteca</th><th>Nível</th></tr></thead>
+<tbody>
+<tr><td><b>POSIX Pthreads</b></td><td>User-level <b>ou</b> kernel-level</td></tr>
+<tr><td><b>Windows Threads</b></td><td>Kernel-level</td></tr>
+<tr><td><b>Java Threads</b></td><td>Geridas pela JVM (usam a biblioteca do host)</td></tr>
+</tbody>
+</table>
+
+<h2 id="t7-modelos">7. Modelos de multithreading</h2>
+<p>Relação entre user threads e kernel threads — três formas:</p>
+<table>
+<thead><tr><th>Modelo</th><th>Mapeamento</th><th>Paralelismo</th><th>Bloqueio</th><th>Exemplos</th></tr></thead>
+<tbody>
+<tr><td><b>Many-to-One</b></td><td>muitas user → 1 kernel</td><td><b>Sem</b> paralelismo real</td><td>uma a bloquear <b>bloqueia todas</b></td><td>Solaris Green Threads, GNU Portable Threads</td></tr>
+<tr><td><b>One-to-One</b></td><td>1 user → 1 kernel</td><td><b>Sim</b></td><td>bloqueio de uma não bloqueia as outras</td><td>Linux, Windows NT/XP/2000, Solaris 9+</td></tr>
+<tr><td><b>Many-to-Many</b></td><td>muitas user → nº ≤ de kernel</td><td>até ao nº de kernel threads</td><td>kernel escalona outra ao bloquear</td><td>Solaris &lt; 9, Windows ThreadFiber</td></tr>
+</tbody>
+</table>
+<div class="callout"><b>One-to-one:</b> permite paralelismo real, mas o overhead de criar muitas kernel threads faz a maioria das implementações <b>limitar o número de threads</b>. <b>Many-to-many</b> combina o melhor: muitas user threads + paralelismo limitado sem o bloqueio total do many-to-one.</div>
+
+<h2 id="t8-pthreads">8. Pthreads — create / exit / join</h2>
+<pre><code>pthread_create(&amp;tid, &amp;attr, runner, arg);  // attr=NULL -&gt; atributos por omissão
+pthread_exit(rval_ptr);                      // termina SÓ a thread
+pthread_join(tid, &amp;rval_ptr);                // espera (bloqueia) que tid termine</code></pre>
+<ul>
+  <li><code>pthread_create</code>: a nova thread executa <code>start_rtn(arg)</code>; o TID fica em <code>tidp</code>; <code>attr=NULL</code> usa os atributos por omissão. Retorna 0 em sucesso, número de erro em falha.</li>
+  <li><code>pthread_join(tid, rval_ptr)</code>: bloqueia até <code>tid</code> chamar <code>pthread_exit()</code> ou retornar da sua rotina; o código de retorno fica em <code>rval_ptr</code>.</li>
+</ul>
+<div class="callout warn"><b>Armadilha clássica:</b> <code>pthread_exit()</code> ou um simples <code>return</code> da rotina inicial termina <b>apenas a thread</b>. Mas se uma thread chamar <code>exit()</code>, <b>termina o processo inteiro</b> (todas as threads). No exemplo dos slides, a variável <code>sum</code> é global e <b>partilhada</b> entre as threads.</div>
+
+<h2 id="t9-exec-fork">9. Semântica de exec() e fork() com threads</h2>
+<ul>
+  <li><b><code>exec()</code></b> numa thread → substitui o <b>processo inteiro, incluindo todas as threads</b>.</li>
+  <li><b><code>fork()</code></b> tem tipicamente <b>duas versões</b>: (a) duplica <b>todas</b> as threads (novo processo multithreaded); (b) duplica <b>só a thread chamadora</b> (novo processo single-threaded).</li>
+</ul>
+
+<!-- ════════════════════════════ SISTEMA DE FICHEIROS ════════════════════════════ -->
+<div class="parthead p-fs"><sub>CONJUNTO #07 · CAPÍTULOS 13–14</sub><h2>📁 Sistema de Ficheiros</h2></div>
+
+<h2 id="f1-ficheiro">10. Ficheiro, atributos e tipos</h2>
+<p>O sistema de ficheiros (FS) é a parte mais visível do SO. Tem <b>duas partes</b>: uma <b>coleção de ficheiros</b> (cada um uma unidade lógica de armazenamento) e uma <b>estrutura de diretórios</b>. O FS abstrai as propriedades físicas dos dispositivos, que são <b>não voláteis</b> (o conteúdo persiste entre reinícios).</p>
+<p><b>Atributos típicos de um ficheiro:</b> Name, Type (muitas vezes a extensão), Location (ponteiro para o sítio no dispositivo), Size, Protection (quem pode ler/escrever/executar) e Time/date/user-id.</p>
+<p>Exemplos de tipos: <code>executable</code> (exe, bin), <code>object</code> (obj, o), <code>source</code> (c, java), <code>batch</code> (bat, sh), <code>library</code> (lib, a, so, dll), <code>archive</code> (zip, tar), <code>multimedia</code> (mp3, avi)…</p>
+
+<h2 id="f2-acesso">11. Acesso e proteção</h2>
+<p><b>Padrões de acesso a um ficheiro:</b></p>
+<ul>
+  <li><b>Sequencial:</b> bytes lidos/escritos por ordem (a maioria dos acessos).</li>
+  <li><b>Aleatório/direto:</b> bytes lidos/escritos sem ordem (sem ter de ler tudo até ao ponto desejado).</li>
+</ul>
+<p><b>Direitos de acesso (proteção):</b> Read, Write, Execute, <b>Append</b> (escrever só no <em>fim</em>), Delete e List.</p>
+<div class="callout"><b>Append vs Write:</b> <em>append</em> acrescenta apenas no fim do ficheiro; <em>write</em> escreve/reescreve.</div>
+
+<h2 id="f4-organizacao">12. Organização: partições e volumes</h2>
+<p>Um dispositivo pode ser usado inteiro ou subdividido em <b>partições</b>. Uma partição <b>sem FS</b> (<b>raw partition</b>) serve para <em>swap</em> ou bases de dados que formatam os dados à medida. Um <b>volume</b> é a entidade que contém um FS — pode ser um dispositivo inteiro, parte de um, ou vários dispositivos ligados.</p>
+<table>
+<thead><tr><th>Estrutura</th><th>Conteúdo</th><th>Nomes alternativos</th></tr></thead>
+<tbody>
+<tr><td><b>Boot control block</b></td><td>1.º bloco do volume; info para arrancar o SO</td><td>boot block (UFS) · partition boot sector (NTFS)</td></tr>
+<tr><td><b>Volume control block</b></td><td>nº total de blocos, blocos livres, tamanho de bloco, ponteiros</td><td>superblock (UFS) · parte da master file table (NTFS)</td></tr>
+<tr><td><b>Directory structure</b></td><td>organiza diretórios e ficheiros</td><td>parte da master file table (NTFS)</td></tr>
+</tbody>
+</table>
+
+<h2 id="f5-diretorios">13. Diretórios e links</h2>
+<p>A estrutura de diretórios é como uma <b>tabela de símbolos</b> que traduz <b>nomes → entradas de diretório</b>. Deve permitir inserir/apagar/procurar/listar, ser eficiente e conveniente.</p>
+<ul>
+  <li><b>Tree-structured:</b> raiz única, cada ficheiro com um <em>path name</em> único. Cada processo tem um <b>diretório atual</b>. Caminho <b>absoluto</b> (começa na raiz, ex.: <code>/spell/mail/exp</code>) vs <b>relativo</b> (a partir do diretório atual).</li>
+  <li><b>Acyclic-graph:</b> permite <b>partilhar</b> ficheiros/subdiretórios via <b>links</b> (ponteiros/path names). Um ficheiro passa a ter vários caminhos absolutos.</li>
+  <li><b>General graph:</b> permite <b>ciclos</b> → problemas: difícil saber se se pode apagar; o contador de referências pode <b>nunca chegar a 0</b> (referências circulares); pode ser preciso <b>garbage collection</b>. Evita-se permitindo links só a ficheiros, não a subdiretórios.</li>
+</ul>
+<div class="callout key"><b>Symbolic link vs hard link (na eliminação):</b><br>• <b>Symbolic link:</b> apagar o link não afeta o original; apagar o <b>original</b> deixa os links <b>inválidos</b> ("illegal file name").<br>• <b>Hard link:</b> mantém-se um <b>contador de referências</b>; o ficheiro só é apagado quando o contador chega a <b>0</b>.</div>
+
+<h2 id="f6-abertos">14. Ficheiros abertos · FCB</h2>
+<p>Para evitar procurar a entrada do ficheiro a cada operação, usa-se <code>open()</code> antes do primeiro uso. <code>open()</code> devolve um índice para a <b>per-process open-file table</b> — chamado <b>file descriptor</b> (UNIX) ou <b>file handle</b> (Windows). Há <b>duas tabelas</b>:</p>
+<table>
+<thead><tr><th>System-wide open-file table</th><th>Per-process open-file table</th></tr></thead>
+<tbody>
+<tr><td>Independente do processo</td><td>Específica de cada processo</td></tr>
+<tr><td><b>FCB</b> (file control block) — evita ler do disco a cada operação</td><td>Referência à entrada na system-wide</td></tr>
+<tr><td><b>File-open count</b> — quantos processos têm o ficheiro aberto (remove o FCB quando o último fecha)</td><td>Modo de acesso + <b>file pointer</b> (última posição de leitura/escrita)</td></tr>
+</tbody>
+</table>
+<p>O <b>FCB</b> contém: permissões, datas, dono/grupo/ACL, tamanho e <b>ponteiros para os blocos de dados</b>.</p>
+
+<h2 id="f7-mount-vfs">15. Montagem e VFS</h2>
+<p>Tal como um ficheiro tem de ser aberto, um FS tem de ser <b>montado (mount)</b> antes de acedido. O SO recebe o nome do volume e o <b>mount point</b> (localização onde o FS é anexado), tipicamente um <b>diretório vazio</b>.</p>
+<p>O <b>Virtual File System (VFS)</b> é uma camada que permite usar a mesma interface (<code>open/read/write/close</code>) para vários tipos de FS, separando interface da implementação e despachando as chamadas para a implementação certa. Assenta numa estrutura única chamada <b>vnode</b>.</p>
+
+<h2 id="f8-alocacao">16. Alocação de espaço em disco</h2>
+<p>Objetivo de desenho: usar o disco eficientemente e aceder rápido. Três grandes métodos:</p>
+<table>
+<thead><tr><th>Método</th><th>Como funciona</th><th>Acesso aleatório</th><th>Frag. externa</th><th>Crescer</th></tr></thead>
+<tbody>
+<tr><td><b>Contígua</b></td><td>start + length; blocos seguidos</td><td>imediato: bloco <b>B+N</b></td><td><b>Sim</b> (precisa desfragmentar)</td><td>Difícil (saber tamanho à priori)</td></tr>
+<tr><td><b>Ligada (linked)</b></td><td>cada bloco aponta para o seguinte; fim = nil (−1)</td><td>mau: seguir <b>N ponteiros</b></td><td>Não</td><td>Fácil</td></tr>
+<tr><td><b>FAT</b></td><td>tabela no início do volume, 1 entrada por bloco</td><td>eficiente (sobretudo com FAT em cache)</td><td>Não</td><td>Fácil</td></tr>
+<tr><td><b>Indexada</b></td><td>index block = array de ponteiros</td><td>via index block</td><td>Não</td><td>Fácil</td></tr>
+</tbody>
+</table>
+<ul>
+  <li><b>Contígua:</b> mínimo de seeks; mas tem fragmentação externa e é difícil fazer crescer.</li>
+  <li><b>Ligada:</b> sem fragmentação externa, fácil de crescer; mas <b>desperdiça espaço em ponteiros</b> (ex.: ponteiro de 4 bytes num bloco de 512 → <b>0,78%</b> do disco) e o acesso aleatório é péssimo. A <b>FAT</b> resolve o desperdício (ponteiros ficam na tabela, não nos blocos de dados).</li>
+  <li><b>Indexada:</b> cada ficheiro tem um index block; para ficheiros grandes usa-se <b>esquema ligado</b>, <b>índice multinível</b> ou <b>inodes UNIX</b>.</li>
+</ul>
+<div class="callout"><b>Índice multinível (números):</b> bloco de 4 096 B → 1 024 ponteiros de 4 B. <b>Dois níveis</b> → 1 024×1 024 = 1 048 576 blocos → ficheiro até <b>4 GB</b>.</div>
+<div class="callout key"><b>Inodes UNIX:</b> esquema combinado — vários <b>ponteiros diretos</b> + os <b>3 últimos</b> ponteiros são <b>single indirect</b>, <b>double indirect</b> e <b>triple indirect</b>, permitindo ficheiros enormes.</div>
+
+<!-- ════════════════════════════ ARMAZENAMENTO ════════════════════════════ -->
+<div class="parthead p-storage"><sub>CONJUNTO #08 · CAPÍTULO 11</sub><h2>💽 Dispositivos de Armazenamento</h2></div>
+
+<h2 id="d1-hdd">17. HDD e SSD</h2>
+<p>Um <b>HDD</b> grava dados magneticamente em <b>pratos (platters)</b> que rodam. Estrutura:</p>
+<ul>
+  <li><b>Track (pista):</b> pista circular concêntrica — milhares por prato.</li>
+  <li><b>Sector (sector):</b> subdivisão da track (centenas por track) — <b>unidade mínima</b> de leitura/escrita.</li>
+  <li><b>Cylinder (cilindro):</b> conjunto de tracks na <b>mesma posição do braço</b> em todos os pratos.</li>
+  <li>Componentes: spindle, arm assembly, arm, read-write head (uma por superfície).</li>
+</ul>
+<div class="callout key"><b>SSD vs HDD:</b> o SSD é memória <b>não volátil</b> sem partes móveis. <b>Vantagens:</b> mais fiável (sem partes móveis), mais rápido (<b>sem seek time nem latência rotacional</b>), menos energia. <b>Desvantagens:</b> menos capacidade, mais caro por MB, tempo de vida potencialmente menor.</div>
+<div class="callout warn"><b>Armadilha:</b> uma <em>track</em> está num só prato; um <em>cilindro</em> é o conjunto de tracks alinhadas em todos os pratos.</div>
+
+<h2 id="d3-transferencias">18. Transferências e latências</h2>
+<p>O disco liga ao computador por um <b>I/O bus</b> (SATA, USB, SCSI…). As transferências são feitas por <b>controllers</b>: o <b>host controller</b> (no computador) envia o comando ao <b>disk controller</b> (no disco), que opera o hardware. Os dados passam pela <b>cache do disk controller</b>.</p>
+<p>Uma operação de I/O tem <b>5 fases</b> (a <b>disk latency</b> é a soma de todas):</p>
+<ol>
+  <li><b>Queuing time</b> — o device driver processar o pedido.</li>
+  <li><b>Controller time</b> — o controlador executar a operação.</li>
+  <li><b>Seek time</b> — mover o braço até ao <b>cilindro</b> desejado.</li>
+  <li><b>Rotational latency</b> — o <b>sector</b> rodar até à cabeça.</li>
+  <li><b>Transfer time</b> — transferir os dados.</li>
+</ol>
+<table>
+<thead><tr><th>Valor</th><th>Típico</th></tr></thead>
+<tbody>
+<tr><td>Average seek time</td><td>3–12 ms</td></tr>
+<tr><td>15 000 RPM</td><td>4 ms/rotação → <b>2 ms</b> de latência rotacional média</td></tr>
+<tr><td>10 000 RPM</td><td>6 ms/rotação → <b>3 ms</b> de latência rotacional média</td></tr>
+<tr><td>Transfer rate</td><td>50–100 MB/s</td></tr>
+</tbody>
+</table>
+<div class="callout"><b>Regra:</b> latência rotacional média = <b>metade</b> do tempo de uma rotação completa.</div>
+
+<h2 id="d5-desempenho">19. Desempenho (cálculos típicos)</h2>
+<p>Pressupostos: transfer rate 100 MB/s, sector 1 KB (transferir 1 KB ≈ <b>0,01 ms</b>), disco 15 000 RPM (2 ms latência média, 3 ms seek médio).</p>
+<table>
+<thead><tr><th>Cenário</th><th>Tempo</th><th>Taxa efetiva</th></tr></thead>
+<tbody>
+<tr><td>Sector em local aleatório do disco</td><td>3 + 2 + 0,01 = <b>5,01 ms</b></td><td>~200 KB/s</td></tr>
+<tr><td>Sector aleatório no <b>mesmo cilindro</b> (sem seek)</td><td>2 + 0,01 = <b>2,01 ms</b></td><td>~500 KB/s (2,5× melhor)</td></tr>
+<tr><td>Sector <b>seguinte na mesma track</b></td><td><b>0,01 ms</b></td><td>100 MB/s (200× melhor)</td></tr>
+</tbody>
+</table>
+<div class="callout key"><b>Conclusão:</b> a chave é <b>minimizar os atrasos de seek e rotacionais</b>. Por isso a alocação <b>contígua</b> de ficheiros gera pedidos próximos (pouco movimento), enquanto <b>ligada/indexada</b> pode espalhar os blocos (mais movimento).</div>
+
+<h2 id="d6-escalonamento">20. Escalonamento de disco</h2>
+<p>O SO mantém uma <b>fila de pedidos por disco</b>. Os algoritmos otimizam tipicamente só as <b>tracks</b> pedidas (ignoram sectores) e só fazem sentido <b>quando há fila</b>. Exemplo comum: fila <code>98, 183, 37, 122, 14, 124, 65, 67</code>, cabeça em <b>53</b>, cilindros 0–199.</p>
+<table>
+<thead><tr><th>Algoritmo</th><th>Ideia</th><th>Movimento total</th><th>Prós / Contras</th></tr></thead>
+<tbody>
+<tr><td><b>FCFS</b></td><td>ordem de chegada</td><td><b>640</b></td><td>+ justo / − seeks longos</td></tr>
+<tr><td><b>SSTF</b></td><td>pedido mais próximo da cabeça</td><td><b>236</b></td><td>+ reduz seeks / − <b>starvation</b></td></tr>
+<tr><td><b>SCAN</b> (elevador)</td><td>varre até ao fim e inverte</td><td><b>236</b></td><td>+ poucos seeks, sem starvation / − favorece tracks do meio</td></tr>
+<tr><td><b>C-SCAN</b></td><td>serve só numa direção; salta ao início</td><td><b>382</b></td><td>+ espera mais uniforme / − seeks longos no regresso</td></tr>
+<tr><td><b>C-LOOK / LOOK</b></td><td>como C-SCAN/SCAN mas <b>não vai até ao fim físico</b></td><td><b>322</b> (C-LOOK)</td><td>+ evita seeks inúteis</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><b>Armadilhas:</b> neste exemplo SSTF e SCAN dão o <b>mesmo</b> valor (236); C-SCAN (382) &gt; C-LOOK (322). <b>SSTF</b> pode causar <b>starvation</b>; SCAN/LOOK/C-LOOK não. <b>FCFS</b> é o único descrito como <em>justo</em>.</div>
+<p><b>Discos modernos:</b> a latência rotacional pode ser quase tão grande como o seek; como o disco <b>não expõe a localização física dos blocos lógicos</b>, o escalonamento move-se para o <b>hardware do controlador</b> (o SO envia <em>batches</em>). <b>SSD scheduling:</b> sem cabeças móveis, a maioria usa <b>FCFS</b>; como as <em>escritas</em> não têm tempo uniforme (flash), alguns escalonadores <b>juntam escritas adjacentes</b> e mantêm as leituras em FCFS.</p>
+
+<!-- ════════════════════════════ GESTÃO DE MEMÓRIA ════════════════════════════ -->
+<div class="parthead p-mem"><sub>CONJUNTO #09 · CAPÍTULO 9</sub><h2>🧮 Gestão de Memória</h2></div>
+
+<h2 id="m1-fundamentos">21. Fundamentos &amp; proteção (base/limit)</h2>
+<p>Só a <b>memória</b> e os <b>registos</b> são acessíveis diretamente pelo CPU. A memória é acedida pelo <em>memory bus</em> (vários ciclos → o CPU pode fazer <em>stall</em>); a <b>cache</b> entre memória e registos acelera os acessos e é gerida pelo hardware, sem o SO.</p>
+<p id="m2-protecao">Cada processo precisa de um <b>espaço de memória separado</b>. A proteção <b>tem de ser feita por hardware</b> (não pelo SO, por desempenho). Um par de registos define o espaço:</p>
+<ul>
+  <li><b>Base register:</b> menor endereço físico legal.</li>
+  <li><b>Limit register:</b> tamanho da gama.</li>
+</ul>
+<p>O hardware compara cada endereço: se <code>base ≤ addr &lt; base+limit</code> permite; senão dispara um <b>trap</b> (addressing error). Os registos são carregados do PCB no context switch e o utilizador não os pode alterar.</p>
+
+<h2 id="m3-logico-fisico">22. Endereços lógicos vs físicos · binding</h2>
+<ul>
+  <li><b>Endereço lógico:</b> gerado pelo <b>CPU</b>.</li>
+  <li><b>Endereço físico:</b> visto pela <b>unidade de memória</b>.</li>
+</ul>
+<div class="callout key"><b>Binding de endereços (muito cobrado):</b> em <b>compile time</b> e <b>load time</b> os endereços lógico e físico são <b>IGUAIS</b>; só em <b>execution time</b> ficam <b>DIFERENTES</b> (requer relocação dinâmica / MMU).</div>
+
+<h2 id="m4-mmu">23. MMU e relocação</h2>
+<p>A <b>MMU</b> é o hardware que, em <em>run time</em>, mapeia endereços lógicos para físicos. No esquema base, o <b>relocation register</b> é <b>somado</b> a cada endereço lógico. O programa só vê endereços lógicos (0..Max); nunca vê os físicos (B..B+Max).</p>
+<pre><code>relocation register = 14000
+endereço lógico 346  →  físico = 14000 + 346 = 14346</code></pre>
+
+<h2 id="m5-swapping">24. Swapping</h2>
+<p><b>Swapping:</b> mover temporariamente processos de memória para um <b>backing store</b> (disco rápido) e trazê-los de volta. Permite que o espaço total dos processos <b>exceda a memória física</b>.</p>
+<ul>
+  <li>A maior parte do tempo de swap é <b>transfer time</b>, <b>proporcional à quantidade de memória</b> swapped → context-switch time elevado.</li>
+  <li>Um processo não precisa de voltar aos mesmos endereços físicos (se houver alocação dinâmica via relocation register).</li>
+  <li>Um processo com I/O pendente só pode ser swapped out com <b>double buffering</b> (I/O para buffers do kernel).</li>
+</ul>
+
+<h2 id="m6-contigua">25. Alocação contígua · first/best/worst-fit</h2>
+<p>Na <b>alocação contígua</b> cada processo ocupa uma única secção contígua. Memória dividida em partições (fixas, ou variáveis ao tamanho do processo); o kernel regista as zonas livres (<b>holes</b>). Quando um processo termina, holes adjacentes são combinados.</p>
+<p>Problema de alocação dinâmica — estratégias:</p>
+<table>
+<thead><tr><th>Estratégia</th><th>Escolhe…</th><th>Nota</th></tr></thead>
+<tbody>
+<tr><td><b>First-fit</b></td><td>o <b>primeiro</b> hole suficiente</td><td>geralmente o <b>mais rápido</b></td></tr>
+<tr><td><b>Best-fit</b></td><td>o <b>menor</b> hole suficiente</td><td>tem de pesquisar tudo; menor leftover</td></tr>
+<tr><td><b>Worst-fit</b></td><td>o <b>maior</b> hole</td><td>maior leftover; <b>pior</b> dos três</td></tr>
+</tbody>
+</table>
+<div class="callout"><b>Simulações:</b> first-fit e best-fit são <b>ambos melhores que worst-fit</b> (velocidade e espaço); <b>first-fit costuma ser mais rápido que best-fit</b>.</div>
+
+<h2 id="m7-fragmentacao">26. Fragmentação interna vs externa</h2>
+<div class="callout key"><b>Interna:</b> memória <b>alocada mas não usada DENTRO</b> de uma partição/frame (ex.: alocou-se um bloco de 1000 B para um pedido de 998 B). A <b>paginação</b> sofre disto (em média ~<b>meia página</b> por processo).<br><b>Externa:</b> espaço livre total suficiente, mas <b>espalhado</b> em pedaços <b>não contíguos</b>. A alocação <b>contígua</b> e a <b>segmentação</b> sofrem disto; a <b>paginação não</b>.</div>
+<p><b>Soluções para a externa:</b> <b>compactação</b> (mover memória para juntar os holes — só possível com alocação dinâmica em execution time; pode ser <b>cara</b>) ou esquemas <b>não contíguos</b> (segmentação, paginação).</p>
+
+<h2 id="m8-segmentacao">27. Segmentação</h2>
+<p>A <b>segmentação</b> encaixa na visão do programador: o espaço lógico é uma <b>coleção de segmentos</b> de tamanho variável (main, stack, heap, funções…). Endereço lógico = <code>&lt;segment-number, offset&gt;</code>.</p>
+<ul>
+  <li><b>Segment table</b> (no PCB): cada entrada tem <b>base</b> (endereço físico inicial) e <b>limit</b> (comprimento). <b>STBR</b> aponta para a tabela; <b>STLR</b> dá o nº de segmentos (S legal se <code>S &lt; STLR</code>).</li>
+  <li>Tradução: se <code>offset &lt; limit[s]</code> → físico = <code>base[s] + offset</code>; senão <b>trap</b>.</li>
+  <li><b>Vantagens:</b> partilha de segmentos; swap independente. <b>Desvantagens:</b> sofre do problema de alocação dinâmica (fits) e de <b>fragmentação externa</b>.</li>
+</ul>
+
+<h2 id="m9-paginacao">28. Paginação</h2>
+<p>A <b>paginação</b> permite espaço físico <b>não contíguo</b>. Comparada com a segmentação: torna alocação/swapping mais fáceis, <b>evita fragmentação externa</b>, não precisa de compactação e o <b>hardware é mais simples</b> (não compara com um limit). Por isso é usada em quase todos os SO.</p>
+<ul>
+  <li>Memória lógica em <b>páginas</b>; memória física (e backing store) em <b>frames</b> do mesmo tamanho (potência de 2). Carregar N páginas → encontrar N frames livres (não têm de ser contíguos).</li>
+  <li>A <b>page table</b> mapeia página → frame.</li>
+</ul>
+<div class="callout key"><b>Divisão do endereço:</b> se o espaço lógico é 2<sup>m</sup> e a página é 2<sup>n</sup> bytes, os <b>m−n bits altos</b> são o <b>page number (p)</b> e os <b>n bits baixos</b> o <b>page offset (d)</b>.<br><b>Tradução:</b> <code>físico = frame × tamanho_da_página + offset</code>.</div>
+<pre><code>Página de 4 bytes; page table {0→5, 1→6, 2→1, 3→2}
+lógico 2  (pág 0, off 2) → 5×4 + 2 = 22
+lógico 5  (pág 1, off 1) → 6×4 + 1 = 25
+lógico 15 (pág 3, off 3) → 2×4 + 3 = 11</code></pre>
+<p><b>Fragmentação interna na paginação</b> — ex.: página 2 048 B, processo 72 766 B = 35 páginas + 1 086 B → 36 frames; desperdício = 2 048 − 1 086 = <b>962 B</b>. <b>Tamanho da página</b>: pequena → menos frag. interna mas page tables maiores e I/O menos eficiente; típico hoje <b>4 KB a 8 KB</b>.</p>
+
+<h2 id="m10-tlb-eat">29. TLB e Effective Access Time</h2>
+<p>Sem ajuda, cada acesso exigiria <b>2 acessos à memória</b> (page table + dados). A <b>TLB</b> é uma cache associativa pequena (64–1024 entradas) que compara todas as keys em simultâneo, sem penalização (faz parte do pipeline):</p>
+<ul>
+  <li><b>TLB hit:</b> o frame está logo disponível (1 acesso à memória — os dados).</li>
+  <li><b>TLB miss:</b> vai à page table em memória e adiciona o par à TLB (2 acessos).</li>
+</ul>
+<div class="callout key"><b>EAT</b> = HitRatio × (TLB + mem) + MissRatio × (TLB + 2×mem)</div>
+<pre><code>TLB=20 ns, mem=100 ns
+Hit 80%: 0,80×(20+100) + 0,20×(20+200) = 96 + 44 = 140 ns
+Hit 98%: 0,98×(120)    + 0,02×(220)    = 117,6 + 4,4 = 122 ns</code></pre>
+
+<h2 id="m11-page-tables">30. Estruturas de page table · paginação + segmentação</h2>
+<p>Uma page table pode ser enorme: 32 bits + página 4 KB → 2<sup>20</sup> entradas × 4 B = <b>4 MB</b>. Registos rápidos não são viáveis → a tabela fica em memória, com <b>PTBR</b> (base) e <b>PTLR</b> (tamanho). Dois problemas e duas soluções:</p>
+<ul>
+  <li><b>Memória cara da tabela →</b> <b>hierarchical paging</b> (page table de page tables; só se aloca o necessário). Em 32 bits: <code>[p1=10 | p2=10 | d=12]</code> (2<sup>10</sup>×4 B = 4 KB). Custa um acesso extra <b>por nível</b>. Em 64 bits são precisos vários níveis (o x86-64 usa 48 bits e <b>4 níveis</b>).</li>
+  <li><b>Dois acessos por referência →</b> <b>TLB</b> (ver §29).</li>
+</ul>
+<p id="m12-paginacao-segmentacao"><b>Paginação + segmentação:</b> processo = segmentos de tamanho variável, cada um dividido em páginas fixas. Endereço = <code>&lt;segment, page, offset&gt;</code>; uma <b>segment table por processo</b> + uma <b>page table por segmento</b>. <b>Evita fragmentação externa</b> e permite partilha aos dois níveis (segmento inteiro ou frame individual).</p>
+
+<!-- ════════════════════════════ MEMÓRIA VIRTUAL ════════════════════════════ -->
+<div class="parthead p-vm"><sub>CONJUNTO #10 · CAPÍTULO 10</sub><h2>🪄 Memória Virtual</h2></div>
+
+<h2 id="v1-conceito">31. Conceito e demand paging</h2>
+<p>O programa inteiro raramente é todo usado ao mesmo tempo (código de erros raros, estruturas sobredimensionadas…). <b>Memória virtual</b> = técnica que permite <b>executar processos que não estão inteiramente em memória</b>.</p>
+<p><b>Benefícios:</b> menos uso de memória; criação de processos mais eficiente; menos I/O para carregar/swap; mais programas concorrentes; e o <b>espaço lógico pode ser muito maior que o físico</b>.</p>
+<div class="callout"><b>Demand paging:</b> carregar uma página <b>só quando é necessária</b> (regra 90-10: 90% do tempo em 10% do código). Páginas nunca acedidas nunca são carregadas; quem está fora reside em memória secundária (disco).</div>
+
+<h2 id="v3-page-fault">32. Page fault e bit válido-inválido</h2>
+<p>Associa-se um <b>bit válido-inválido</b> a cada entrada da page table (inicialmente tudo inválido):</p>
+<ul>
+  <li><b>v (válido):</b> a página está em memória e é legal.</li>
+  <li><b>i (inválido):</b> a página está <b>no disco</b> <em>ou</em> <b>não é legal</b> (fora do espaço de endereçamento).</li>
+</ul>
+<p>Um <b>page fault</b> ocorre quando o hardware acede a uma página marcada inválida (trap para o SO). <b>Tratamento:</b></p>
+<ol>
+  <li>Verificar no PCB se o acesso é legal (ilegal → <b>terminar o processo</b>).</li>
+  <li>Encontrar um <b>frame livre</b> e trazer a página do backing store.</li>
+  <li><b>Repor</b> a page table (página agora em memória, bit → v).</li>
+  <li><b>Reiniciar</b> a instrução que causou o fault.</li>
+</ol>
+
+<h2 id="v4-eat">33. EAT do demand paging</h2>
+<div class="callout key"><b>EAT</b> = (1 − p) × tempo_acesso_memória + p × tempo_de_page_fault, onde <b>p</b> é a probabilidade de page fault.</div>
+<p>O <em>page-fault service time</em> tem 3 tarefas: atender a interrupção (1–100 µs), <b>ler a página</b> (5–10 ms, a mais lenta) e reiniciar o processo (1–100 µs).</p>
+<pre><code>mem = 200 ns, page-fault service = 8 ms = 8 000 000 ns
+EAT = 200 + p × 7 999 800  (ns)
+p = 0,001  → 8 199,8 ns ≈ 8,2 µs  (≈ 41× mais lento!)
+&lt;10% degradação → p &lt; 0,0000025  (1 fault em 400 000 acessos)</code></pre>
+<p>Conclusão: a taxa de page faults tem de ser <b>muito baixa</b>.</p>
+
+<h2 id="v5-replacement">34. Substituição de páginas (page replacement)</h2>
+<p>Se não há frame livre, faz-se <b>page replacement</b>: escolher uma <b>victim page</b>, escrevê-la no disco, trazer a desejada e atualizar a page table. São <b>2 transferências</b> (out + in) → duplica o service time.</p>
+<div class="callout"><b>Dirty (modify) bit:</b> marca-se quando a página é escrita. Se a victim page <b>não</b> foi modificada (clean), <b>não é preciso escrevê-la de volta</b> ao disco (já lá está) → poupa uma transferência. <b>Objetivo</b> de qualquer algoritmo: <b>minimizar o número de page faults</b>.</div>
+
+<h2 id="v6-algoritmos">35. Algoritmos: FIFO · OPT · LRU</h2>
+<p>Avaliam-se correndo o algoritmo sobre uma <b>reference string</b> (só números de páginas) e contando page faults. Aceder de novo à mesma página em memória <b>não</b> causa fault.</p>
+<ul>
+  <li><b>FIFO:</b> substitui a página <b>mais antiga</b> (fila: entra na cauda, sai pela cabeça). Simples, mas pode ser mau.</li>
+  <li><b>OPT (ótimo):</b> substitui a página que <b>só será usada mais tarde</b> (ou nunca). Tem a <b>menor taxa de faults possível</b>, mas é <b>impossível de implementar</b> (não se lê o futuro) — serve de referência.</li>
+  <li><b>LRU (least recently used):</b> substitui a que <b>não é usada há mais tempo</b> ("OPT a olhar para trás"). Bom, mas <b>melhor que FIFO e pior que OPT</b>. Implementa-se com <b>contadores</b> (time-of-use; procura na substituição) ou com <b>stack</b> (LRU sempre no fundo; sem procura, mas atualização mais cara).</li>
+</ul>
+<div class="callout"><b>Exemplo (3 frames, string A B C A B D A D B C B):</b> FIFO = <b>7 faults</b>; LRU = <b>5</b>; Second Chance = <b>5</b>; Aging = <b>5</b>.</div>
+
+<h2 id="v7-aproximacoes">36. Aproximações a LRU</h2>
+<p>LRU "puro" precisa de hardware a cada acesso (atualizar relógio/stack), o que seria ~10× mais lento. Usa-se um <b>reference bit (R)</b> (posto a 1 quando a página é acedida; sabemos <em>se</em> foi usada, não a <em>ordem</em>):</p>
+<table>
+<thead><tr><th>Algoritmo</th><th>Ideia</th></tr></thead>
+<tbody>
+<tr><td><b>Second chance</b></td><td>FIFO + reference bit: se R=0 substitui; se R=1 limpa o bit e <b>move para a cauda</b> (dá 2.ª chance).</td></tr>
+<tr><td><b>Clock</b></td><td>Implementação eficiente do second chance: <b>fila circular</b> + ponteiro que avança limpando bits até achar R=0 (evita mover páginas).</td></tr>
+<tr><td><b>NRU</b></td><td>Usa (R,M) em 4 classes: <b>(0,0)</b> melhor para substituir &lt; (0,1) &lt; (1,0) &lt; <b>(1,1)</b> pior. Substitui a classe não-vazia mais baixa.</td></tr>
+<tr><td><b>LFU/NFU</b></td><td>Contador por página somando o reference bit a cada tick; substitui o de menor contagem. Problema: página muito usada no início fica "presa".</td></tr>
+<tr><td><b>Aging</b></td><td>Como LFU mas o contador é <b>deslocado à direita</b> (÷2) antes de somar o R <b>à esquerda</b> → dá prioridade ao uso recente.</td></tr>
+</tbody>
+</table>
+<pre><code>Aging (bits R: 1,0,0,1,1,0):
+10000000 → 01000000 → 00100000 → 10010000 → 11001000 → 01100100</code></pre>
+
+<h2 id="v8-frames">37. Alocação de frames</h2>
+<p>É preciso alocar a memória física (fixa) entre processos, com um <b>mínimo de frames</b> por processo:</p>
+<ul>
+  <li><b>Equal:</b> quota igual a todos (100 frames, 2 processos → 50 cada).</li>
+  <li><b>Proportional:</b> proporcional ao tamanho — <code>frame_i = (tamanho_i / total) × frames</code> (100 frames, processos de 20 e 180 páginas → <b>10</b> e <b>90</b>).</li>
+  <li><b>Priority:</b> proporcional à prioridade (ou prioridade + tamanho).</li>
+</ul>
+<div class="callout key"><b>Global vs local replacement:</b> <b>Global</b> — um processo pode "roubar" um frame a outro; maior throughput, <b>mais comum</b>, mas tempo de execução variável. <b>Local</b> — só do seu conjunto; desempenho consistente, mas pode subutilizar memória.</div>
+
+<h2 id="v9-thrashing">38. Thrashing · working set · PFF</h2>
+<p><b>Thrashing:</b> o processo passa <b>mais tempo a paginar do que a executar</b> (poucos frames → page fault → substitui página de que logo precisa → fault outra vez…). Resultado: <b>baixa utilização de CPU</b>. No gráfico CPU × grau de multiprogramação, a utilização sobe e depois <b>cai abruptamente</b> quando começa o thrashing.</p>
+<ul>
+  <li><b>Working set:</b> conjunto de páginas usadas numa janela de tempo <b>Δ</b> (aproxima a localidade). <b>Demanda total</b> <code>D = Σ WS<sub>i</sub></code>; se <code>D &gt; frames totais</code> → thrashing. Solução: suspender/swap out um processo. Δ pequeno demais não cobre a localidade; grande demais cobre várias.</li>
+  <li><b>Page-Fault Frequency (PFF):</b> controla diretamente a taxa de faults com <b>limites superior e inferior</b> — taxa alta → dar <b>mais frames</b>; taxa baixa → <b>tirar frames</b>.</li>
+</ul>
+
+<!-- ════════════════════════════ PERGUNTAS ABERTAS ════════════════════════════ -->
+<div class="parthead p-open"><sub>TREINO · CÁLCULO</sub><h2>✍️ Perguntas abertas resolvidas</h2></div>
+<p id="perguntas-abertas">O exame tem 5 perguntas abertas (coloca-se só a <b>resposta final</b>, sem penalização). Estas são do estilo de cálculo mais provável.</p>
+
+<h3>P1 — Divisão de endereço (paginação)</h3>
+<p><b>Enunciado:</b> espaço de endereçamento lógico de 32 bits e páginas de 4 KB. (a) Quantos bits para o offset? (b) Quantas entradas tem a page table?</p>
+<div class="callout tip"><b>(a)</b> 4 KB = 2<sup>12</sup> → <b>12 bits</b> de offset. <b>(b)</b> 32 − 12 = 20 bits de page number → <b>2<sup>20</sup> = 1 048 576 entradas</b>.</div>
+
+<h3>P2 — Tradução de endereço (paginação)</h3>
+<p><b>Enunciado:</b> páginas de 4 bytes; page table {0→5, 1→6, 2→1, 3→2}. Qual o endereço físico do endereço lógico 5?</p>
+<div class="callout tip">Lógico 5 → página = 5÷4 = 1, offset = 1. Página 1 → frame 6. Físico = 6×4 + 1 = <b>25</b>.</div>
+
+<h3>P3 — Effective Access Time com TLB</h3>
+<p><b>Enunciado:</b> TLB = 20 ns, acesso à memória = 100 ns, hit ratio = 98%. Qual o EAT?</p>
+<div class="callout tip">EAT = 0,98×(20+100) + 0,02×(20+100+100) = 117,6 + 4,4 = <b>122 ns</b>.</div>
+
+<h3>P4 — EAT com demand paging</h3>
+<p><b>Enunciado:</b> acesso à memória = 200 ns, page-fault service = 8 ms, p = 0,001. Qual o EAT?</p>
+<div class="callout tip">EAT = (1−0,001)×200 + 0,001×8 000 000 = 199,8 + 8 000 = <b>8 199,8 ns ≈ 8,2 µs</b>.</div>
+
+<h3>P5 — Contar page faults (FIFO vs LRU)</h3>
+<p><b>Enunciado:</b> 3 frames, reference string <code>A B C A B D A D B C B</code>. Quantos page faults com FIFO e com LRU?</p>
+<div class="callout tip">FIFO = <b>7</b>; LRU = <b>5</b>.</div>
+
+<h3>P6 — Fragmentação interna (paginação)</h3>
+<p><b>Enunciado:</b> páginas de 2 048 B, processo de 72 766 B. Quantos frames e qual a fragmentação interna?</p>
+<div class="callout tip">72 766 / 2 048 = 35 páginas + 1 086 B → <b>36 frames</b>. Fragmentação interna = 2 048 − 1 086 = <b>962 B</b>.</div>
+
+<h3>P7 — Escalonamento de disco</h3>
+<p><b>Enunciado:</b> fila 98, 183, 37, 122, 14, 124, 65, 67; cabeça em 53. Movimento total da cabeça com FCFS e com SSTF?</p>
+<div class="callout tip">FCFS = <b>640</b> cilindros; SSTF = <b>236</b> cilindros (SCAN também dá 236; C-SCAN = 382; C-LOOK = 322).</div>
+
+<h3>P8 — Tempo de acesso a disco</h3>
+<p><b>Enunciado:</b> disco 15 000 RPM, seek médio 3 ms, transferir 1 KB ≈ 0,01 ms. Tempo para ler um sector num local aleatório?</p>
+<div class="callout tip">15 000 RPM → 4 ms/rotação → 2 ms latência média. Tempo = 3 (seek) + 2 (rotacional) + 0,01 (transfer) = <b>5,01 ms</b>.</div>
+
+<h3>P9 — Alocação proporcional de frames</h3>
+<p><b>Enunciado:</b> 100 frames; processo A de 20 páginas e processo B de 180 páginas. Quantos frames para cada?</p>
+<div class="callout tip">A = (20/200)×100 = <b>10 frames</b>; B = (180/200)×100 = <b>90 frames</b>.</div>
+
+<hr>
+<p style="text-align:center;color:var(--muted);font-size:.9em">Bom estudo! 📗 — Sistemas de Operações · FCUP 2025/2026</p>
+
+<a href="#topo" class="back-to-top" id="backTop" title="Voltar ao topo">↑</a>
+<script>
+window.addEventListener('scroll',function(){
+  document.getElementById('backTop').style.display = window.scrollY>500 ? 'block':'none';
+});
+</script>
+</body>
+</html>
